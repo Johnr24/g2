@@ -93,6 +93,7 @@
 #define M1_POLARITY                 0                       // 1po  0=normal, 1=reversed
 #define M1_POWER_MODE               MOTOR_POWER_MODE        // 1pm  TRUE=low power idle enabled
 #define M1_POWER_LEVEL              0.500
+#define M1_steps_per_unit           40
 
 #define M2_MOTOR_MAP                AXIS_Y_EXTERNAL
 #define M2_STEP_ANGLE               1.8
@@ -115,7 +116,7 @@
 #define JERK_MAX                    5000
 
 #define X_AXIS_MODE                 AXIS_STANDARD           // xam  see canonical_machine.h cmAxisMode for valid values
-#define X_VELOCITY_MAX              50000                   // xvm  G0 max velocity in mm/min
+#define X_VELOCITY_MAX              8000                   // xvm  G0 max velocity in mm/min
 #define X_FEEDRATE_MAX              X_VELOCITY_MAX          // xfr  G1 max feed rate in mm/min
 #define X_TRAVEL_MIN                0                       // xtn  minimum travel for soft limits
 #define X_TRAVEL_MAX                420                     // xtm  travel between switches or crashes
@@ -129,7 +130,7 @@
 #define X_ZERO_BACKOFF              2                       // xzb  mm
 
 #define Y_AXIS_MODE                 AXIS_STANDARD
-#define Y_VELOCITY_MAX              50000
+#define Y_VELOCITY_MAX              8000
 #define Y_FEEDRATE_MAX              Y_VELOCITY_MAX
 #define Y_TRAVEL_MIN                0
 #define Y_TRAVEL_MAX                420
@@ -143,10 +144,10 @@
 #define Y_ZERO_BACKOFF              2
 
 #define Z_AXIS_MODE                 AXIS_STANDARD
-#define Z_VELOCITY_MAX              1200
+#define Z_VELOCITY_MAX              4000
 #define Z_FEEDRATE_MAX              Z_VELOCITY_MAX
 #define Z_TRAVEL_MAX                0
-#define Z_TRAVEL_MIN                -95
+#define Z_TRAVEL_MIN                -120
 #define Z_JERK_MAX                  500
 #define Z_JERK_HIGH_SPEED           1000
 #define Z_HOMING_INPUT              6
