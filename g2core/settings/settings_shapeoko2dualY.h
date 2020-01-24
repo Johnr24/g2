@@ -111,20 +111,12 @@
 #define M3_POWER_MODE               MOTOR_POWER_MODE
 #define M3_POWER_LEVEL              1
 
-//#define M4_MOTOR_MAP                AXIS_Z
-//#define M4_STEP_ANGLE               1.8
-//#define M4_TRAVEL_PER_REV           8
-//#define M4_MICROSTEPS               4
-//#define M4_POLARITY                 0
-//#define M4_POWER_MODE               MOTOR_POWER_MODE
-//#define M4_POWER_LEVEL              1
-
 // *** axis settings **********************************************************************************
 
 #define JERK_MAX                    5000
 
 #define X_AXIS_MODE                 AXIS_STANDARD           // xam  see canonical_machine.h cmAxisMode for valid values
-#define X_VELOCITY_MAX              8000                   // xvm  G0 max velocity in mm/min
+#define X_VELOCITY_MAX              16000                   // xvm  G0 max velocity in mm/min
 #define X_FEEDRATE_MAX              X_VELOCITY_MAX          // xfr  G1 max feed rate in mm/min
 #define X_TRAVEL_MIN                0                       // xtn  minimum travel for soft limits
 #define X_TRAVEL_MAX                530                     // xtm  travel between switches or crashes
@@ -138,7 +130,7 @@
 #define X_ZERO_BACKOFF              2                       // xzb  mm
 
 #define Y_AXIS_MODE                 AXIS_STANDARD
-#define Y_VELOCITY_MAX              8000
+#define Y_VELOCITY_MAX              16000
 #define Y_FEEDRATE_MAX              Y_VELOCITY_MAX
 #define Y_TRAVEL_MIN                0
 #define Y_TRAVEL_MAX                319
@@ -155,7 +147,7 @@
 #define Z_VELOCITY_MAX              6000
 #define Z_FEEDRATE_MAX              Z_VELOCITY_MAX
 #define Z_TRAVEL_MAX                0
-#define Z_TRAVEL_MIN                -200
+#define Z_TRAVEL_MIN                -180
 #define Z_JERK_MAX                  500
 #define Z_JERK_HIGH_SPEED           1000
 #define Z_HOMING_INPUT              6
@@ -190,7 +182,7 @@
 #define DI1_FUNCTION                INPUT_FUNCTION_LIMIT
 
 // Xmax
-#define DI2_MODE                    NORMALLY_CLOSED
+#define DI2_MODE                    IO_MODE_DISABLED
 //#define DI2_ACTION                  INPUT_ACTION_STOP
 #define DI2_ACTION                  INPUT_ACTION_NONE
 #define DI2_FUNCTION                INPUT_FUNCTION_LIMIT
@@ -202,7 +194,7 @@
 #define DI3_FUNCTION                INPUT_FUNCTION_LIMIT
 
 // Ymax
-#define DI4_MODE                    NORMALLY_CLOSED
+#define DI4_MODE                    IO_MODE_DISABLED
 //#define DI4_ACTION                  INPUT_ACTION_STOP
 #define DI4_ACTION                  INPUT_ACTION_NONE
 #define DI4_FUNCTION                INPUT_FUNCTION_LIMIT
