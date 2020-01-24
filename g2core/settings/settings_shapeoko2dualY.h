@@ -88,36 +88,36 @@
 
 #define M1_MOTOR_MAP                AXIS_X                  // 1ma
 #define M1_STEP_ANGLE              1.8                     // 1sa
-#define M1_TRAVEL_PER_REV           20.00                   // 1tr
+#define M1_TRAVEL_PER_REV           40.00                   // 1tr
 #define M1_MICROSTEPS               8                       // 1mi  1,2,4,8,16,32
-#define M1_POLARITY                 0                       // 1po  0=normal, 1=reversed
+#define M1_POLARITY                 1                       // 1po  0=normal, 1=reversed
 #define M1_POWER_MODE               MOTOR_POWER_MODE        // 1pm  TRUE=low power idle enabled
 #define M1_POWER_LEVEL              1
 //#define M1_STEPS_PER_UNIT           1337
 
 #define M2_MOTOR_MAP                AXIS_Y
 #define M2_STEP_ANGLE               1.8
-#define M2_TRAVEL_PER_REV           20.00
+#define M2_TRAVEL_PER_REV           40.00
 #define M2_MICROSTEPS               32
 #define M2_POLARITY                 0
 #define M2_POWER_MODE               MOTOR_POWER_MODE
 #define M2_POWER_LEVEL              1
 
-#define M3_MOTOR_MAP                AXIS_Y
-#define M3_STEP_ANGLE               M2_STEP_ANGLE
-#define M3_TRAVEL_PER_REV           M2_TRAVEL_PER_REV
-#define M3_MICROSTEPS               M2_MICROSTEPS
+#define M3_MOTOR_MAP                AXIS_Z
+#define M3_STEP_ANGLE               1.8
+#define M3_TRAVEL_PER_REV           8
+#define M3_MICROSTEPS               4
 #define M3_POLARITY                 1
 #define M3_POWER_MODE               MOTOR_POWER_MODE
-#define M3_POWER_LEVEL              M2_POWER_LEVEL
+#define M3_POWER_LEVEL              1
 
-#define M4_MOTOR_MAP                AXIS_Z
-#define M4_STEP_ANGLE               1.8
-#define M4_TRAVEL_PER_REV           8
-#define M4_MICROSTEPS               4
-#define M4_POLARITY                 0
-#define M4_POWER_MODE               MOTOR_POWER_MODE
-#define M4_POWER_LEVEL              1
+//#define M4_MOTOR_MAP                AXIS_Z
+//#define M4_STEP_ANGLE               1.8
+//#define M4_TRAVEL_PER_REV           8
+//#define M4_MICROSTEPS               4
+//#define M4_POLARITY                 0
+//#define M4_POWER_MODE               MOTOR_POWER_MODE
+//#define M4_POWER_LEVEL              1
 
 // *** axis settings **********************************************************************************
 
