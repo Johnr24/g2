@@ -105,7 +105,7 @@
 
 #define M3_MOTOR_MAP                AXIS_Z
 #define M3_STEP_ANGLE               1.8
-#define M3_TRAVEL_PER_REV           8
+#define M3_TRAVEL_PER_REV           
 #define M3_MICROSTEPS               4
 #define M3_POLARITY                 1
 #define M3_POWER_MODE               MOTOR_POWER_MODE
@@ -184,36 +184,36 @@
     INPUT_FUNCTION_PANIC
 */
 // Xmin on v9 board
-#define DI1_MODE                    NORMALLY_CLOSED
+#define DI1_MODE                    NORMALLY_OPEN
 //#define DI1_ACTION                  INPUT_ACTION_STOP
 #define DI1_ACTION                  INPUT_ACTION_NONE
 #define DI1_FUNCTION                INPUT_FUNCTION_LIMIT
 
 // Xmax
-#define DI2_MODE                    NORMALLY_CLOSED
+#define DI2_MODE                    NORMALLY_OPEN
 //#define DI2_ACTION                  INPUT_ACTION_STOP
 #define DI2_ACTION                  INPUT_ACTION_NONE
 #define DI2_FUNCTION                INPUT_FUNCTION_LIMIT
 
 // Ymin
-#define DI3_MODE                    NORMALLY_CLOSED
+#define DI3_MODE                    IO_ACTIVE_LOW
 //#define DI3_ACTION                  INPUT_ACTION_STOP
 #define DI3_ACTION                  INPUT_ACTION_NONE
 #define DI3_FUNCTION                INPUT_FUNCTION_LIMIT
 
 // Ymax
-#define DI4_MODE                    NORMALLY_CLOSED
+#define DI4_MODE                    NORMALLY_OPEN
 //#define DI4_ACTION                  INPUT_ACTION_STOP
 #define DI4_ACTION                  INPUT_ACTION_NONE
 #define DI4_FUNCTION                INPUT_FUNCTION_LIMIT
 
 // Zmin
-#define DI5_MODE                    IO_ACTIVE_LOW   // Z probe
+#define DI5_MODE                    IO_ACTIVE_HIGH   // Z probe
 #define DI5_ACTION                  INPUT_ACTION_NONE
 #define DI5_FUNCTION                INPUT_FUNCTION_PROBE
 
 // Zmax
-#define DI6_MODE                    NORMALLY_CLOSED
+#define DI6_MODE                    NORMALLY_OPEN
 //#define DI6_ACTION                  INPUT_ACTION_STOP
 #define DI6_ACTION                  INPUT_ACTION_NONE
 #define DI6_FUNCTION                INPUT_FUNCTION_LIMIT
