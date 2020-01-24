@@ -152,8 +152,8 @@
 #define Y_ZERO_BACKOFF              2
 
 #define Z_AXIS_MODE                 AXIS_STANDARD
-#define Z_VELOCITY_MAX              2000
-#define Z_FEEDRATE_MAX              6000
+#define Z_VELOCITY_MAX              6000
+#define Z_FEEDRATE_MAX              Z_VELOCITY_MAX
 #define Z_TRAVEL_MAX                0
 #define Z_TRAVEL_MIN                -200
 #define Z_JERK_MAX                  500
