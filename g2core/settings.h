@@ -56,7 +56,7 @@
 
 // Anything not set by the above file is set by this one...
 // The defaults below generally disable that function
-#include "settings/settings_shapeoko2dualY.h"
+#include "settings/settings_default.h"
 
 // compile-time assertions - mostly checking the settings are not impossible
 
