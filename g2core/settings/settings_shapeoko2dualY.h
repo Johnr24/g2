@@ -90,7 +90,7 @@
 #define M1_STEP_ANGLE              1.8                     // 1sa
 #define M1_TRAVEL_PER_REV           40.00                   // 1tr
 #define M1_MICROSTEPS               8                       // 1mi  1,2,4,8,16,32
-#define M1_POLARITY                 0                       // 1po  0=normal, 1=reversed
+#define M1_POLARITY                 1                       // 1po  0=normal, 1=reversed
 #define M1_POWER_MODE               MOTOR_POWER_MODE        // 1pm  TRUE=low power idle enabled
 #define M1_POWER_LEVEL              1
 
@@ -106,7 +106,7 @@
 #define M3_STEP_ANGLE               1.8
 #define M3_TRAVEL_PER_REV           8
 #define M3_MICROSTEPS               4
-#define M3_POLARITY                 0
+#define M3_POLARITY                 1
 #define M3_POWER_MODE               MOTOR_POWER_MODE
 #define M3_POWER_LEVEL              1
 
@@ -145,12 +145,12 @@
 #define Z_AXIS_MODE                 AXIS_STANDARD
 #define Z_VELOCITY_MAX              3000
 #define Z_FEEDRATE_MAX              Z_VELOCITY_MAX
-#define Z_TRAVEL_MAX                -180
-#define Z_TRAVEL_MIN                0
+#define Z_TRAVEL_MAX                0
+#define Z_TRAVEL_MIN                -180
 #define Z_JERK_MAX                  500
 #define Z_JERK_HIGH_SPEED           1000
 #define Z_HOMING_INPUT              5
-#define Z_HOMING_DIRECTION          0
+#define Z_HOMING_DIRECTION          1
 #define Z_SEARCH_VELOCITY           (Z_VELOCITY_MAX * 0.66666)
 #define Z_LATCH_VELOCITY            25
 #define Z_LATCH_BACKOFF             4
