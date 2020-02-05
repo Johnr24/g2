@@ -64,9 +64,9 @@
 #define stringify(a) stringify2(a)
 
 //static_assert ( bool_constexpr , message )    // bool_constexpr must be true or assertion will fail
-//static_assert ( (A_RADIUS > RADIUS_MIN), "A axis radius must be more than " stringify(RADIUS_MIN) ", but is " stringify(A_RADIUS) );
-//static_assert ( (B_RADIUS > RADIUS_MIN), "B axis radius must be more than " stringify(RADIUS_MIN) ", but is " stringify(B_RADIUS) );
-//static_assert ( (C_RADIUS > RADIUS_MIN), "C axis radius must be more than " stringify(RADIUS_MIN) ", but is " stringify(C_RADIUS) );
+static_assert ( (A_RADIUS > RADIUS_MIN), "A axis radius must be more than " stringify(RADIUS_MIN) ", but is " stringify(A_RADIUS) );
+static_assert ( (B_RADIUS > RADIUS_MIN), "B axis radius must be more than " stringify(RADIUS_MIN) ", but is " stringify(B_RADIUS) );
+static_assert ( (C_RADIUS > RADIUS_MIN), "C axis radius must be more than " stringify(RADIUS_MIN) ", but is " stringify(C_RADIUS) );
 
 #undef stringify 
 #undef stringify2

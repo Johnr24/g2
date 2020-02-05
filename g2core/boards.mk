@@ -27,11 +27,11 @@
 ##########
 # V9-based configs:
 
-ifeq ("$(CONFIG)","Shapeoko2DualY")
+ifeq ("$(CONFIG)","ShapeokoDualY")
     ifeq ("$(BOARD)","NONE")
         BOARD=g2v9k
     endif
-    SETTINGS_FILE="settings_shapeoko2dualY.h"
+    SETTINGS_FILE="settings_shapeoko2.h"
 endif
 
 ifeq ("$(CONFIG)","Othermill")

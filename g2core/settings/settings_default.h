@@ -220,6 +220,8 @@
 //*** Motor Settings **********************************************************
 //*****************************************************************************
 
+// *** motor settings ************************************************************************************
+
 // MOTOR 1
 #ifndef M1_MOTOR_MAP
 #define M1_MOTOR_MAP                AXIS_X_EXTERNAL         // {1ma: AXIS_X, AXIS_Y...
@@ -228,7 +230,7 @@
 #define M1_STEP_ANGLE               1.8                     // {1sa: degrees per step
 #endif
 #ifndef M1_TRAVEL_PER_REV
-#define M1_TRAVEL_PER_REV           1.25                    // {1tr:  1.25 is a typical value for a screw axis
+#define M1_TRAVEL_PER_REV           40                    // {1tr:  1.25 is a typical value for a screw axis
 #endif
 #ifndef M1_MICROSTEPS
 #define M1_MICROSTEPS               8                       // {1mi:  1,2,4,8,    16,32 (G2 ONLY)
@@ -237,7 +239,7 @@
 #define M1_STEPS_PER_UNIT           0                       // {1su:  steps to issue per unit of length or degrees of rotation
 #endif
 #ifndef M1_POLARITY
-#define M1_POLARITY                 0                       // {1po:  0=normal direction, 1=inverted direction
+#define M1_POLARITY                 1                     // {1po:  0=normal direction, 1=inverted direction
 #endif
 #ifndef M1_ENABLE_POLARITY
 #define M1_ENABLE_POLARITY          IO_ACTIVE_LOW           // {1ep:  IO_ACTIVE_LOW or IO_ACTIVE_HIGH
@@ -246,10 +248,10 @@
 #define M1_STEP_POLARITY            IO_ACTIVE_HIGH          // {1ps:  IO_ACTIVE_LOW or IO_ACTIVE_HIGH
 #endif
 #ifndef M1_POWER_MODE
-#define M1_POWER_MODE               MOTOR_DISABLED          // {1pm:  MOTOR_DISABLED, MOTOR_ALWAYS_POWERED, MOTOR_POWERED_IN_CYCLE, MOTOR_POWERED_ONLY_WHEN_MOVING
+#define M1_POWER_MODE               MOTOR_ALWAYS_POWERED          // {1pm:  MOTOR_DISABLED, MOTOR_ALWAYS_POWERED, MOTOR_POWERED_IN_CYCLE, MOTOR_POWERED_ONLY_WHEN_MOVING
 #endif
 #ifndef M1_POWER_LEVEL
-#define M1_POWER_LEVEL              0.0                     // {1pl:   0.0=no power, 1.0=max power
+#define M1_POWER_LEVEL              1                    // {1pl:   0.0=no power, 1.0=max power
 #endif
 
 // MOTOR 2
@@ -263,7 +265,7 @@
 #define M2_TRAVEL_PER_REV           40.00
 #endif
 #ifndef M2_MICROSTEPS
-#define M2_MICROSTEPS               8
+#define M2_MICROSTEPS               32
 #endif
 #ifndef M2_STEPS_PER_UNIT
 #define M2_STEPS_PER_UNIT           0
@@ -278,10 +280,10 @@
 #define M2_STEP_POLARITY            IO_ACTIVE_HIGH
 #endif
 #ifndef M2_POWER_MODE
-#define M2_POWER_MODE               MOTOR_DISABLED
+#define M2_POWER_MODE               MOTOR_ALWAYS_POWERED
 #endif
 #ifndef M2_POWER_LEVEL
-#define M2_POWER_LEVEL              0.0
+#define M2_POWER_LEVEL              1
 #endif
 
 // MOTOR 3
@@ -292,16 +294,16 @@
 #define M3_STEP_ANGLE               1.8
 #endif
 #ifndef M3_TRAVEL_PER_REV
-#define M3_TRAVEL_PER_REV           1.25                    // 1.25 is a typical value for a screw axis
+#define M3_TRAVEL_PER_REV           8                    // 1.25 is a typical value for a screw axis
 #endif
 #ifndef M3_MICROSTEPS
-#define M3_MICROSTEPS               8
+#define M3_MICROSTEPS               4
 #endif
 #ifndef M3_STEPS_PER_UNIT
 #define M3_STEPS_PER_UNIT           0
 #endif
 #ifndef M3_POLARITY
-#define M3_POLARITY                 0
+#define M3_POLARITY                 1
 #endif
 #ifndef M3_ENABLE_POLARITY
 #define M3_ENABLE_POLARITY          IO_ACTIVE_LOW
@@ -310,10 +312,10 @@
 #define M3_STEP_POLARITY            IO_ACTIVE_HIGH
 #endif
 #ifndef M3_POWER_MODE
-#define M3_POWER_MODE               MOTOR_DISABLED
+#define M3_POWER_MODE               MOTOR_ALWAYS_POWERED
 #endif
 #ifndef M3_POWER_LEVEL
-#define M3_POWER_LEVEL              0.0
+#define M3_POWER_LEVEL              1
 #endif
 
 // MOTOR 4
@@ -418,34 +420,34 @@
 
 // X AXIS
 #ifndef X_AXIS_MODE
-#define X_AXIS_MODE                 AXIS_DISABLED           // {xam:  see canonical_machine.h cmAxisMode for valid values
+#define X_AXIS_MODE                 AXIS_STANDARD           // {xam:  see canonical_machine.h cmAxisMode for valid values
 #endif
 #ifndef X_VELOCITY_MAX
-#define X_VELOCITY_MAX              1000.0                  // {xvm:  G0 max velocity in mm/min
+#define X_VELOCITY_MAX              16000.0                  // {xvm:  G0 max velocity in mm/min
 #endif
 #ifndef X_FEEDRATE_MAX
-#define X_FEEDRATE_MAX              1000.0                  // {xfr:  G1 max feed rate in mm/min
+#define X_FEEDRATE_MAX              16000.0                  // {xfr:  G1 max feed rate in mm/min
 #endif
 #ifndef X_TRAVEL_MIN
 #define X_TRAVEL_MIN                0.0                     // {xtn:  minimum travel for soft limits
 #endif
 #ifndef X_TRAVEL_MAX
-#define X_TRAVEL_MAX                0.0                     // {xtm:  travel between switches or crashes
+#define X_TRAVEL_MAX                530                    // {xtm:  travel between switches or crashes
 #endif
 #ifndef X_JERK_MAX
-#define X_JERK_MAX                  1000.0                  // {xjm:
+#define X_JERK_MAX                  5000.0                  // {xjm:
 #endif
 #ifndef X_JERK_HIGH_SPEED
-#define X_JERK_HIGH_SPEED           1000.0                  // {xjh:
+#define X_JERK_HIGH_SPEED           20000.0                  // {xjh:
 #endif
 #ifndef X_HOMING_INPUT
-#define X_HOMING_INPUT              0                       // {xhi:  input used for homing or 0 to disable
+#define X_HOMING_INPUT              1                       // {xhi:  input used for homing or 0 to disable
 #endif
 #ifndef X_HOMING_DIRECTION
 #define X_HOMING_DIRECTION          0                       // {xhd:  0=search moves negative, 1= search moves positive
 #endif
 #ifndef X_SEARCH_VELOCITY
-#define X_SEARCH_VELOCITY           500.0                   // {xsv:  minus means move to minimum switch
+#define X_SEARCH_VELOCITY          3000.0                   // {xsv:  minus means move to minimum switch
 #endif
 #ifndef X_LATCH_VELOCITY
 #define X_LATCH_VELOCITY            100.0                   // {xlv:  mm/min
@@ -459,34 +461,34 @@
 
 // Y AXIS
 #ifndef Y_AXIS_MODE
-#define Y_AXIS_MODE                 AXIS_DISABLED
+#define Y_AXIS_MODE                 AXIS_STANDARD
 #endif
 #ifndef Y_VELOCITY_MAX
-#define Y_VELOCITY_MAX              1000.0
+#define Y_VELOCITY_MAX              16000.0
 #endif
 #ifndef Y_FEEDRATE_MAX
-#define Y_FEEDRATE_MAX              1000.0
+#define Y_FEEDRATE_MAX              16000.0
 #endif
 #ifndef Y_TRAVEL_MIN
 #define Y_TRAVEL_MIN                0.0
 #endif
 #ifndef Y_TRAVEL_MAX
-#define Y_TRAVEL_MAX                0.0
+#define Y_TRAVEL_MAX                319.0
 #endif
 #ifndef Y_JERK_MAX
 #define Y_JERK_MAX                  1000.0
 #endif
 #ifndef Y_JERK_HIGH_SPEED
-#define Y_JERK_HIGH_SPEED           1000.0
+#define Y_JERK_HIGH_SPEED           20000.0
 #endif
 #ifndef Y_HOMING_INPUT
-#define Y_HOMING_INPUT              0
+#define Y_HOMING_INPUT              3
 #endif
 #ifndef Y_HOMING_DIRECTION
 #define Y_HOMING_DIRECTION          0
 #endif
 #ifndef Y_SEARCH_VELOCITY
-#define Y_SEARCH_VELOCITY           500.0
+#define Y_SEARCH_VELOCITY           3000.0
 #endif
 #ifndef Y_LATCH_VELOCITY
 #define Y_LATCH_VELOCITY            100.0
@@ -500,34 +502,34 @@
 
 // Z AXIS
 #ifndef Z_AXIS_MODE
-#define Z_AXIS_MODE                 AXIS_DISABLED
+#define Z_AXIS_MODE                 AXIS_STANDARD
 #endif
 #ifndef Z_VELOCITY_MAX
-#define Z_VELOCITY_MAX              1000.0
+#define Z_VELOCITY_MAX              3000.0
 #endif
 #ifndef Z_FEEDRATE_MAX
-#define Z_FEEDRATE_MAX              1000.0
+#define Z_FEEDRATE_MAX              3000.0
 #endif
 #ifndef Z_TRAVEL_MAX
-#define Z_TRAVEL_MAX                0.0
+#define Z_TRAVEL_MAX                0
 #endif
 #ifndef Z_TRAVEL_MIN
-#define Z_TRAVEL_MIN                0.0
+#define Z_TRAVEL_MIN                -180
 #endif
 #ifndef Z_JERK_MAX
 #define Z_JERK_MAX                  500.0
 #endif
 #ifndef Z_JERK_HIGH_SPEED
-#define Z_JERK_HIGH_SPEED           500.0
+#define Z_JERK_HIGH_SPEED           1000.0
 #endif
 #ifndef Z_HOMING_INPUT
-#define Z_HOMING_INPUT              0
+#define Z_HOMING_INPUT              6
 #endif
 #ifndef Z_HOMING_DIRECTION
-#define Z_HOMING_DIRECTION          0
+#define Z_HOMING_DIRECTION          1
 #endif
 #ifndef Z_SEARCH_VELOCITY
-#define Z_SEARCH_VELOCITY           250.0
+#define Z_SEARCH_VELOCITY           2200.0
 #endif
 #ifndef Z_LATCH_VELOCITY
 #define Z_LATCH_VELOCITY            25.0
@@ -855,7 +857,7 @@
 
 // Xmin on v9 board
 #ifndef DI1_MODE
-#define DI1_MODE                    IO_ACTIVE_LOW     // Normally open
+#define DI1_MODE                    IO_ACTIVE_HIGH     // Normally open
 #endif
 #ifndef DI1_ACTION
 #define DI1_ACTION                  INPUT_ACTION_NONE
@@ -866,7 +868,7 @@
 
 // Xmax
 #ifndef DI2_MODE
-#define DI2_MODE                    IO_ACTIVE_LOW     // Normally open
+#define DI2_MODE                    IO_MODE_DISABLED    // Normally open
 #endif
 #ifndef DI2_ACTION
 #define DI2_ACTION                  INPUT_ACTION_NONE
@@ -877,7 +879,7 @@
 
 // Ymin
 #ifndef DI3_MODE
-#define DI3_MODE                    IO_ACTIVE_LOW     // Normally open
+#define DI3_MODE                    IO_ACTIVE_HIGH    // Normally open
 #endif
 #ifndef DI3_ACTION
 #define DI3_ACTION                  INPUT_ACTION_NONE
@@ -888,7 +890,7 @@
 
 // Ymax
 #ifndef DI4_MODE
-#define DI4_MODE                    IO_ACTIVE_LOW     // Normally open
+#define DI4_MODE                    IO_MODE_DISABLED     // Normally open
 #endif
 #ifndef DI4_ACTION
 #define DI4_ACTION                  INPUT_ACTION_NONE
@@ -910,7 +912,7 @@
 
 // Zmax
 #ifndef DI6_MODE
-#define DI6_MODE                    IO_ACTIVE_LOW     // Normally open
+#define DI6_MODE                    IO_ACTIVE_HIGH     // Normally open
 #endif
 #ifndef DI6_ACTION
 #define DI6_ACTION                  INPUT_ACTION_NONE
@@ -921,7 +923,7 @@
 
 // Amin
 #ifndef DI7_MODE
-#define DI7_MODE                    IO_ACTIVE_LOW     // Normally open
+#define DI7_MODE                    IO_MODE_DISABLED     // Normally open
 #endif
 #ifndef DI7_ACTION
 #define DI7_ACTION                  INPUT_ACTION_NONE
@@ -932,7 +934,7 @@
 
 // Amax
 #ifndef DI8_MODE
-#define DI8_MODE                    IO_ACTIVE_LOW     // Normally open
+#define DI8_MODE                    IO_MODE_DISABLED     // Normally open
 #endif
 #ifndef DI8_ACTION
 #define DI8_ACTION                  INPUT_ACTION_NONE
@@ -943,7 +945,7 @@
 
 // Safety line
 #ifndef DI9_MODE
-#define DI9_MODE                    IO_ACTIVE_HIGH     // Normally closed
+#define DI9_MODE                    IO_MODE_DISABLED     // Normally closed
 #endif
 #ifndef DI9_ACTION
 #define DI9_ACTION                  INPUT_ACTION_NONE
@@ -953,7 +955,7 @@
 #endif
 
 #ifndef DI10_MODE
-#define DI10_MODE                   IO_ACTIVE_LOW     // Normally open
+#define DI10_MODE                   IO_MODE_DISABLED     // Normally open
 #endif
 #ifndef DI10_ACTION
 #define DI10_ACTION                 INPUT_ACTION_NONE
@@ -963,7 +965,7 @@
 #endif
 
 #ifndef DI11_MODE
-#define DI11_MODE                   IO_ACTIVE_LOW     // Normally open
+#define DI11_MODE                   IO_MODE_DISABLED     // Normally open
 #endif
 #ifndef DI11_ACTION
 #define DI11_ACTION                 INPUT_ACTION_NONE
@@ -973,7 +975,7 @@
 #endif
 
 #ifndef DI12_MODE
-#define DI12_MODE                   IO_ACTIVE_LOW     // Normally open
+#define DI12_MODE                   IO_MODE_DISABLED     // Normally open
 #endif
 #ifndef DI12_ACTION
 #define DI12_ACTION                 INPUT_ACTION_NONE
