@@ -943,12 +943,12 @@
 #define DI8_FUNCTION                INPUT_FUNCTION_NONE
 #endif
 
-// Safety line BMIN?
+// Safety line BMIN? - THIS IS THE EMERGENCY STOP (pin A6)
 #ifndef DI9_MODE
-#define DI9_MODE                    IO_MODE_DISABLED     // Normally closed
+#define DI9_MODE                    IO_ACTIVE_HIGH     // Normally closed
 #endif
 #ifndef DI9_ACTION
-#define DI9_ACTION                  INPUT_ACTION_NONE
+#define DI9_ACTION                  INPUT_ACTION_FAST_STOP
 #endif
 #ifndef DI9_FUNCTION
 #define DI9_FUNCTION                INPUT_FUNCTION_NONE
