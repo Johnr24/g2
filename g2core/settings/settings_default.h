@@ -943,7 +943,7 @@
 #define DI8_FUNCTION                INPUT_FUNCTION_NONE
 #endif
 
-// Safety line
+// Safety line BMIN?
 #ifndef DI9_MODE
 #define DI9_MODE                    IO_MODE_DISABLED     // Normally closed
 #endif
@@ -953,7 +953,7 @@
 #ifndef DI9_FUNCTION
 #define DI9_FUNCTION                INPUT_FUNCTION_NONE
 #endif
-
+// BMAX?
 #ifndef DI10_MODE
 #define DI10_MODE                   IO_MODE_DISABLED     // Normally open
 #endif
@@ -963,7 +963,7 @@
 #ifndef DI10_FUNCTION
 #define DI10_FUNCTION               INPUT_FUNCTION_NONE
 #endif
-
+//CMIN
 #ifndef DI11_MODE
 #define DI11_MODE                   IO_MODE_DISABLED     // Normally open
 #endif
@@ -973,7 +973,7 @@
 #ifndef DI11_FUNCTION
 #define DI11_FUNCTION               INPUT_FUNCTION_NONE
 #endif
-
+//CMAX
 #ifndef DI12_MODE
 #define DI12_MODE                   IO_MODE_DISABLED     // Normally open
 #endif
