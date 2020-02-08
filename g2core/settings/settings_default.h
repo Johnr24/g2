@@ -423,10 +423,10 @@
 #define X_AXIS_MODE                 AXIS_STANDARD           // {xam:  see canonical_machine.h cmAxisMode for valid values
 #endif
 #ifndef X_VELOCITY_MAX
-#define X_VELOCITY_MAX              16000.0                  // {xvm:  G0 max velocity in mm/min
+#define X_VELOCITY_MAX              8000.0                  // {xvm:  G0 max velocity in mm/min
 #endif
 #ifndef X_FEEDRATE_MAX
-#define X_FEEDRATE_MAX              16000.0                  // {xfr:  G1 max feed rate in mm/min
+#define X_FEEDRATE_MAX              8000.0                  // {xfr:  G1 max feed rate in mm/min
 #endif
 #ifndef X_TRAVEL_MIN
 #define X_TRAVEL_MIN                0.0                     // {xtn:  minimum travel for soft limits
@@ -464,10 +464,10 @@
 #define Y_AXIS_MODE                 AXIS_STANDARD
 #endif
 #ifndef Y_VELOCITY_MAX
-#define Y_VELOCITY_MAX              16000.0
+#define Y_VELOCITY_MAX              8000.0
 #endif
 #ifndef Y_FEEDRATE_MAX
-#define Y_FEEDRATE_MAX              16000.0
+#define Y_FEEDRATE_MAX              8000.0
 #endif
 #ifndef Y_TRAVEL_MIN
 #define Y_TRAVEL_MIN                0.0
@@ -476,7 +476,7 @@
 #define Y_TRAVEL_MAX                319.0
 #endif
 #ifndef Y_JERK_MAX
-#define Y_JERK_MAX                  1000.0
+#define Y_JERK_MAX                  5000.0
 #endif
 #ifndef Y_JERK_HIGH_SPEED
 #define Y_JERK_HIGH_SPEED           20000.0
@@ -517,10 +517,10 @@
 #define Z_TRAVEL_MIN                -180
 #endif
 #ifndef Z_JERK_MAX
-#define Z_JERK_MAX                  500.0
+#define Z_JERK_MAX                  5000.0
 #endif
 #ifndef Z_JERK_HIGH_SPEED
-#define Z_JERK_HIGH_SPEED           1000.0
+#define Z_JERK_HIGH_SPEED           20000.0
 #endif
 #ifndef Z_HOMING_INPUT
 #define Z_HOMING_INPUT              6
