@@ -2,8 +2,8 @@
  * json_parser.cpp - JSON parser
  * This file is part of the g2core project
  *
- * Copyright (c) 2011 - 2018 Alden S. Hart, Jr.
- * Copyright (c) 2016 - 2018 Rob Giseburt
+ * Copyright (c) 2011 - 2019 Alden S. Hart, Jr.
+ * Copyright (c) 2016 - 2019 Rob Giseburt
  *
  * This file ("the software") is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2 as published by the
@@ -110,6 +110,7 @@ void json_parse_for_exec(char *str, bool execute)
         nv = nv_exec;
         status = _json_parser_execute(nv);          // execute the command
     }
+    sr_request_status_report(SR_REQUEST_TIMED);     // generate incremental status report to show any changes
 }
 
 static stat_t _json_parser_execute(nvObj_t *nv) {
@@ -141,7 +142,7 @@ static stat_t _json_parser_execute(nvObj_t *nv) {
 }
 
 // (*) Note: The JSON / token system is essentially flat, as it was derived from a command-line flat-ASCII approach
-//     If the JSON objects had proper recursive descent handlers that just passed the remaining string (at that level) 
+//     If the JSON objects had proper recursive descent handlers that just passed the remaining string (at that level)
 //     off for further processing, we would not need to do this hack. A fix is in the works. For now, this is OK.
 
 static stat_t _json_parser_kernal(nvObj_t *nv, char *str)
@@ -329,7 +330,7 @@ static stat_t _get_nv_pair(nvObj_t *nv, char **pstr, int8_t *depth)
         // if string begins with 0x it might be data, needs to be at least 3 chars long
         if( strlen(*pstr)>=3 && (*pstr)[0]=='0' && (*pstr)[1]=='x')
         {
-            uint32_t *v = (uint32_t*)&nv->value_flt;
+            uint32_t *v = (uint32_t*)&nv->value_int;
             *v = strtoul((const char *)*pstr, 0L, 0);
             nv->valuetype = TYPE_DATA;
         } else {
@@ -448,7 +449,7 @@ uint16_t json_serialize(nvObj_t *nv, char *out_buf, uint16_t size)
                                         *str++ = '"';
                                         break;
                                     }
-                case (TYPE_BOOLEAN):{   if (nv->value_int) {
+                case (TYPE_BOOLEAN):{   if (!nv->value_int) {
                                             strcpy(str, "false");
                                             str += 5;
                                         } else {
@@ -457,7 +458,7 @@ uint16_t json_serialize(nvObj_t *nv, char *out_buf, uint16_t size)
                                         }
                                         break;
                                     }
-                case (TYPE_DATA):   {   uint32_t *v = (uint32_t*)&nv->value_flt;
+                case (TYPE_DATA):   {   uint32_t *v = (uint32_t*)&nv->value_int;
                                         str += sprintf(str, "\"0x%lx\"", *v);
                                         break;
                                     }
@@ -631,7 +632,7 @@ void json_print_response(uint8_t status, const bool only_to_muted /*= false*/)
  * js_get_ej() - get JSON communications mode
  * js_set_ej() - set JSON communications mode
  *
- * This one is a bit different: 
+ * This one is a bit different:
  *  - cs.comm_mode is the setting for the *communications mode* (persistent)
  *  - js.json_mode is the actual current mode
  *
@@ -657,7 +658,7 @@ stat_t js_set_ej(nvObj_t *nv)
 stat_t js_get_jv(nvObj_t *nv) { return(get_integer(nv, js.json_verbosity)); }
 stat_t js_set_jv(nvObj_t *nv)
 {
-    ritorno (set_integer(nv, (uint8_t &)js.json_verbosity, JV_SILENT, JV_MAX_VALUE));  
+    ritorno (set_integer(nv, (uint8_t &)js.json_verbosity, JV_SILENT, JV_MAX_VALUE));
 
     js.echo_json_footer = false;
     js.echo_json_messages = false;
@@ -693,7 +694,7 @@ stat_t json_set_ej(nvObj_t *nv)
         nv->valuetype = TYPE_NULL;
         return (STAT_INPUT_EXCEEDS_MAX_VALUE);
     }
-    
+
     // set json_mode to 0 or 1, but don't change it if comm_mode == 2
     if (commMode(nv->value) < AUTO_MODE) {
         js.json_mode = commMode(nv->value);

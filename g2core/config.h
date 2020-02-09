@@ -2,7 +2,7 @@
  * config.h - configuration sub-system generic part (see config_app for application part)
  * This file is part of the g2core project
  *
- * Copyright (c) 2010 - 2018 Alden S. Hart, Jr.
+ * Copyright (c) 2010 - 2019 Alden S. Hart, Jr.
  *
  * This file ("the software") is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2 as published by the
@@ -53,7 +53,7 @@
  *  with the static assignments for each variable. The cfgArray contains typed data in
  *  program memory.
  *
- *  Each cfgItem has:
+ *  Each cfgItem_t has:
  *   - group string identifying what group the variable is part of or "" if no group
  *   - token string - the token for that variable - pre-pended with the group (if present)
  *   - operations flags - e.g. if the value should be initialized and/or persisted to NVM
@@ -171,7 +171,7 @@
  ***********************************************************************************/
 
 // Sizing and footprints                // chose one based on # of elements in cfgArray
-typedef uint16_t index_t;               // use this if there are > 255 indexed objects
+typedef uint32_t index_t;               // set/get_int is expecting an int32_t
 
                                         // defines allocated from stack (not-pre-allocated)
 #define NV_FORMAT_LEN 128               // print formatting string max length
@@ -185,8 +185,8 @@ typedef uint16_t index_t;               // use this if there are > 255 indexed o
 
 // Stuff you probably don't want to change
 
-#define GROUP_LEN 4                     // max length of group prefix
-#define TOKEN_LEN 6                     // mnemonic token string: group prefix + short token
+#define GROUP_LEN 6                     // max length of group prefix
+#define TOKEN_LEN 9                     // mnemonic token string: group prefix + short token
 #define NV_FOOTER_LEN 18                // sufficient space to contain a JSON footer array
 #define NV_LIST_LEN (NV_BODY_LEN+2)     // +2 allows for a header and a footer
 #define NV_EXEC_FIRST (NV_BODY_LEN+2)   // index of the first EXEC nv
@@ -317,9 +317,11 @@ typedef struct nvList {
     uint16_t magic_end;
 } nvList_t;
 
-typedef struct cfgItem {
-    char group[GROUP_LEN+1];            // group prefix (with NUL termination)
-    char token[TOKEN_LEN+1];            // token - stripped of group prefix (w/NUL termination)
+struct cfgItem_t {
+    // char group[GROUP_LEN+1];            // group prefix (with NUL termination)
+    // char token[TOKEN_LEN+1];            // token - stripped of group prefix (w/NUL termination)
+    const char *group;                  // group prefix (with NUL termination)
+    const char *token;                  // token - stripped of group prefix (w/NUL termination)
     uint8_t flags;                      // operations flags - see defines below
     int8_t precision;                   // decimal precision for display (JSON)
     fptrPrint print;                    // print binding: aka void (*print)(nvObj_t *nv);
@@ -327,13 +329,62 @@ typedef struct cfgItem {
     fptrCmd set;                        // SET binding aka uint8_t (*set)(nvObj_t *nv)
     void *target;                       // target for writing config value
     float def_value;                    // default value for config item
-} cfgItem_t;
+};
 
 /**** static allocation and definitions ****/
 
 extern nvStr_t nvStr;
 extern nvList_t nvl;
-extern const cfgItem_t cfgArray[];
+
+class cfgArraySynthesizer {
+    public:
+    const cfgItem_t& operator[](std::size_t idx) const;
+    index_t getIndex(const char *group, const char *token);
+};
+
+extern cfgArraySynthesizer cfgArray;
+
+class configSubtable {
+   public:
+    virtual const cfgItem_t * const get(std::size_t idx) const;
+    virtual index_t find(const char *token) const;
+
+    constexpr configSubtable(const size_t l) : length{l} {};
+
+    const size_t length;
+};
+
+class cfgSubtableFromStaticArray : public configSubtable {
+    // const size_t array_length;
+    const cfgItem_t *items;
+
+   public:
+    template<typename T, size_t length>
+    constexpr cfgSubtableFromStaticArray(T (&i)[length]) : configSubtable{length}, items{i} {};
+
+    constexpr cfgSubtableFromStaticArray() : configSubtable{0}, items{} {};
+
+    const cfgItem_t * const get(std::size_t idx) const override {
+        return &items[idx];
+    }
+
+    index_t find(const char *token) const override {
+        std::size_t idx = 0;
+
+        while (idx < length) {
+            if (strcmp(token, items[idx].token) == 0) {
+                return idx;
+            }
+            idx++;
+        }
+        return NO_MATCH;
+    }
+
+    // const size_t length() const override {
+    //     return array_length;
+    // }
+};
+
 
 //#define nv_header nv.list
 #define nv_header (&nvl.list[0])
@@ -404,6 +455,7 @@ stat_t set_float_range(nvObj_t *nv, float &value, float low, float high);
 stat_t get_integer(nvObj_t *nv, const int32_t value);   // boilerplate for retrieving 8 bit integer value
 stat_t set_integer(nvObj_t *nv, uint8_t &value, uint8_t low, uint8_t high);
 stat_t set_int32(nvObj_t *nv, int32_t &value, int32_t low, int32_t high);
+stat_t set_uint32(nvObj_t *nv, uint32_t &value, int32_t low, int32_t high);
 
 stat_t get_string(nvObj_t *nv, const char *str);
 

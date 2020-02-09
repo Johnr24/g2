@@ -98,7 +98,12 @@
 #endif
 
 #ifndef SPINDLE_SPINUP_DELAY
+#ifdef SPINDLE_DWELL_TIME
+#define SPINDLE_SPINUP_DELAY SPINDLE_DWELL_TIME
+#warning Please update your settings! SPINDLE_DWELL_TIME is now SPINDLE_SPINUP_DELAY
+#else
 #define SPINDLE_SPINUP_DELAY        0     // {spde:
+#endif
 #endif
 
 #ifndef SPINDLE_DWELL_MAX
@@ -129,8 +134,8 @@
 #define FEEDHOLD_Z_LIFT             0       // {zl: mm to lift Z on feedhold
 #endif
 
-#ifndef PROBE_REPORT_ENABLE 
-#define PROBE_REPORT_ENABLE         true    // {prbr: 
+#ifndef PROBE_REPORT_ENABLE
+#define PROBE_REPORT_ENABLE         true    // {prbr:
 #endif
 
 #ifndef MANUAL_FEEDRATE_OVERRIDE_ENABLE
@@ -220,6 +225,17 @@
 //*** Motor Settings **********************************************************
 //*****************************************************************************
 
+// KINEMATICS (which may later change the following values)
+#define KINE_OTHER -1
+#define KINE_CARTESIAN 0
+#define KINE_CORE_XY 1
+#define KINE_FOUR_CABLE 2
+
+#ifndef KINEMATICS
+#define KINEMATICS KINE_CARTESIAN
+#endif
+
+
 // MOTOR 1
 #ifndef M1_MOTOR_MAP
 #define M1_MOTOR_MAP                AXIS_X_EXTERNAL         // {1ma: AXIS_X, AXIS_Y...
@@ -250,6 +266,9 @@
 #endif
 #ifndef M1_POWER_LEVEL
 #define M1_POWER_LEVEL              0.0                     // {1pl:   0.0=no power, 1.0=max power
+#endif
+#ifndef M1_POWER_LEVEL_IDLE
+#define M1_POWER_LEVEL_IDLE         (M1_POWER_LEVEL/2.0)
 #endif
 
 // MOTOR 2
@@ -283,6 +302,9 @@
 #ifndef M2_POWER_LEVEL
 #define M2_POWER_LEVEL              0.0
 #endif
+#ifndef M2_POWER_LEVEL_IDLE
+#define M2_POWER_LEVEL_IDLE         (M2_POWER_LEVEL/2.0)
+#endif
 
 // MOTOR 3
 #ifndef M3_MOTOR_MAP
@@ -314,6 +336,9 @@
 #endif
 #ifndef M3_POWER_LEVEL
 #define M3_POWER_LEVEL              0.0
+#endif
+#ifndef M3_POWER_LEVEL_IDLE
+#define M3_POWER_LEVEL_IDLE         (M3_POWER_LEVEL/2.0)
 #endif
 
 // MOTOR 4
@@ -347,6 +372,9 @@
 #ifndef M4_POWER_LEVEL
 #define M4_POWER_LEVEL              0.0
 #endif
+#ifndef M4_POWER_LEVEL_IDLE
+#define M4_POWER_LEVEL_IDLE         (M4_POWER_LEVEL/2.0)
+#endif
 
 // MOTOR 5
 #ifndef M5_MOTOR_MAP
@@ -378,6 +406,9 @@
 #endif
 #ifndef M5_POWER_LEVEL
 #define M5_POWER_LEVEL              0.0
+#endif
+#ifndef M5_POWER_LEVEL_IDLE
+#define M5_POWER_LEVEL_IDLE         (M5_POWER_LEVEL/2.0)
 #endif
 
 // MOTOR 6
@@ -411,6 +442,252 @@
 #ifndef M6_POWER_LEVEL
 #define M6_POWER_LEVEL              0.0
 #endif
+#ifndef M6_POWER_LEVEL_IDLE
+#define M6_POWER_LEVEL_IDLE         (M6_POWER_LEVEL/2.0)
+#endif
+
+// TMC2130 config defaults
+// START Generated with ${PROJECT_ROOT}/Resources/generate_motors_default_config.js
+#ifndef M1_TMC2130_TPWMTHRS
+#define M1_TMC2130_TPWMTHRS         1200                    // 1pth
+#endif
+#ifndef M1_TMC2130_TCOOLTHRS
+#define M1_TMC2130_TCOOLTHRS        1000                    // 1cth
+#endif
+#ifndef M1_TMC2130_THIGH
+#define M1_TMC2130_THIGH            10                      // 1hth
+#endif
+#ifndef M1_TMC2130_SGT
+#define M1_TMC2130_SGT              4                       // 1sgt
+#endif
+#ifndef M1_TMC2130_TBL
+#define M1_TMC2130_TBL              2                       // 1tbl
+#endif
+#ifndef M1_TMC2130_PWM_GRAD
+#define M1_TMC2130_PWM_GRAD         1                       // 1pgrd
+#endif
+#ifndef M1_TMC2130_PWM_AMPL
+#define M1_TMC2130_PWM_AMPL         200                     // 1pamp
+#endif
+#ifndef M1_TMC2130_HEND
+#define M1_TMC2130_HEND             0                       // 1hend
+#endif
+#ifndef M1_TMC2130_HSTRT
+#define M1_TMC2130_HSTRT            0                       // 1hsrt
+#endif
+#ifndef M1_TMC2130_SMIN
+#define M1_TMC2130_SMIN             5                       // 1smin
+#endif
+#ifndef M1_TMC2130_SMAX
+#define M1_TMC2130_SMAX             5                       // 1smax
+#endif
+#ifndef M1_TMC2130_SUP
+#define M1_TMC2130_SUP              2                       // 1sup
+#endif
+#ifndef M1_TMC2130_SDN
+#define M1_TMC2130_SDN              1                       // 1sdn
+#endif
+
+#ifndef M2_TMC2130_TPWMTHRS
+#define M2_TMC2130_TPWMTHRS         1200                    // 2pth
+#endif
+#ifndef M2_TMC2130_TCOOLTHRS
+#define M2_TMC2130_TCOOLTHRS        1000                    // 2cth
+#endif
+#ifndef M2_TMC2130_THIGH
+#define M2_TMC2130_THIGH            10                      // 2hth
+#endif
+#ifndef M2_TMC2130_SGT
+#define M2_TMC2130_SGT              4                       // 2sgt
+#endif
+#ifndef M2_TMC2130_TBL
+#define M2_TMC2130_TBL              2                       // 2tbl
+#endif
+#ifndef M2_TMC2130_PWM_GRAD
+#define M2_TMC2130_PWM_GRAD         1                       // 2pgrd
+#endif
+#ifndef M2_TMC2130_PWM_AMPL
+#define M2_TMC2130_PWM_AMPL         200                     // 2pamp
+#endif
+#ifndef M2_TMC2130_HEND
+#define M2_TMC2130_HEND             0                       // 2hend
+#endif
+#ifndef M2_TMC2130_HSTRT
+#define M2_TMC2130_HSTRT            0                       // 2hsrt
+#endif
+#ifndef M2_TMC2130_SMIN
+#define M2_TMC2130_SMIN             5                       // 2smin
+#endif
+#ifndef M2_TMC2130_SMAX
+#define M2_TMC2130_SMAX             5                       // 2smax
+#endif
+#ifndef M2_TMC2130_SUP
+#define M2_TMC2130_SUP              2                       // 2sup
+#endif
+#ifndef M2_TMC2130_SDN
+#define M2_TMC2130_SDN              1                       // 2sdn
+#endif
+
+#ifndef M3_TMC2130_TPWMTHRS
+#define M3_TMC2130_TPWMTHRS         1200                    // 3pth
+#endif
+#ifndef M3_TMC2130_TCOOLTHRS
+#define M3_TMC2130_TCOOLTHRS        1000                    // 3cth
+#endif
+#ifndef M3_TMC2130_THIGH
+#define M3_TMC2130_THIGH            10                      // 3hth
+#endif
+#ifndef M3_TMC2130_SGT
+#define M3_TMC2130_SGT              4                       // 3sgt
+#endif
+#ifndef M3_TMC2130_TBL
+#define M3_TMC2130_TBL              2                       // 3tbl
+#endif
+#ifndef M3_TMC2130_PWM_GRAD
+#define M3_TMC2130_PWM_GRAD         1                       // 3pgrd
+#endif
+#ifndef M3_TMC2130_PWM_AMPL
+#define M3_TMC2130_PWM_AMPL         200                     // 3pamp
+#endif
+#ifndef M3_TMC2130_HEND
+#define M3_TMC2130_HEND             0                       // 3hend
+#endif
+#ifndef M3_TMC2130_HSTRT
+#define M3_TMC2130_HSTRT            0                       // 3hsrt
+#endif
+#ifndef M3_TMC2130_SMIN
+#define M3_TMC2130_SMIN             5                       // 3smin
+#endif
+#ifndef M3_TMC2130_SMAX
+#define M3_TMC2130_SMAX             5                       // 3smax
+#endif
+#ifndef M3_TMC2130_SUP
+#define M3_TMC2130_SUP              2                       // 3sup
+#endif
+#ifndef M3_TMC2130_SDN
+#define M3_TMC2130_SDN              1                       // 3sdn
+#endif
+
+#ifndef M4_TMC2130_TPWMTHRS
+#define M4_TMC2130_TPWMTHRS         1200                    // 4pth
+#endif
+#ifndef M4_TMC2130_TCOOLTHRS
+#define M4_TMC2130_TCOOLTHRS        1000                    // 4cth
+#endif
+#ifndef M4_TMC2130_THIGH
+#define M4_TMC2130_THIGH            10                      // 4hth
+#endif
+#ifndef M4_TMC2130_SGT
+#define M4_TMC2130_SGT              4                       // 4sgt
+#endif
+#ifndef M4_TMC2130_TBL
+#define M4_TMC2130_TBL              2                       // 4tbl
+#endif
+#ifndef M4_TMC2130_PWM_GRAD
+#define M4_TMC2130_PWM_GRAD         1                       // 4pgrd
+#endif
+#ifndef M4_TMC2130_PWM_AMPL
+#define M4_TMC2130_PWM_AMPL         200                     // 4pamp
+#endif
+#ifndef M4_TMC2130_HEND
+#define M4_TMC2130_HEND             0                       // 4hend
+#endif
+#ifndef M4_TMC2130_HSTRT
+#define M4_TMC2130_HSTRT            0                       // 4hsrt
+#endif
+#ifndef M4_TMC2130_SMIN
+#define M4_TMC2130_SMIN             5                       // 4smin
+#endif
+#ifndef M4_TMC2130_SMAX
+#define M4_TMC2130_SMAX             5                       // 4smax
+#endif
+#ifndef M4_TMC2130_SUP
+#define M4_TMC2130_SUP              2                       // 4sup
+#endif
+#ifndef M4_TMC2130_SDN
+#define M4_TMC2130_SDN              1                       // 4sdn
+#endif
+
+#ifndef M5_TMC2130_TPWMTHRS
+#define M5_TMC2130_TPWMTHRS         1200                    // 5pth
+#endif
+#ifndef M5_TMC2130_TCOOLTHRS
+#define M5_TMC2130_TCOOLTHRS        1000                    // 5cth
+#endif
+#ifndef M5_TMC2130_THIGH
+#define M5_TMC2130_THIGH            10                      // 5hth
+#endif
+#ifndef M5_TMC2130_SGT
+#define M5_TMC2130_SGT              4                       // 5sgt
+#endif
+#ifndef M5_TMC2130_TBL
+#define M5_TMC2130_TBL              2                       // 5tbl
+#endif
+#ifndef M5_TMC2130_PWM_GRAD
+#define M5_TMC2130_PWM_GRAD         1                       // 5pgrd
+#endif
+#ifndef M5_TMC2130_PWM_AMPL
+#define M5_TMC2130_PWM_AMPL         200                     // 5pamp
+#endif
+#ifndef M5_TMC2130_HEND
+#define M5_TMC2130_HEND             0                       // 5hend
+#endif
+#ifndef M5_TMC2130_HSTRT
+#define M5_TMC2130_HSTRT            0                       // 5hsrt
+#endif
+#ifndef M5_TMC2130_SMIN
+#define M5_TMC2130_SMIN             5                       // 5smin
+#endif
+#ifndef M5_TMC2130_SMAX
+#define M5_TMC2130_SMAX             5                       // 5smax
+#endif
+#ifndef M5_TMC2130_SUP
+#define M5_TMC2130_SUP              2                       // 5sup
+#endif
+#ifndef M5_TMC2130_SDN
+#define M5_TMC2130_SDN              1                       // 5sdn
+#endif
+
+#ifndef M6_TMC2130_TPWMTHRS
+#define M6_TMC2130_TPWMTHRS         1200                    // 6pth
+#endif
+#ifndef M6_TMC2130_TCOOLTHRS
+#define M6_TMC2130_TCOOLTHRS        1000                    // 6cth
+#endif
+#ifndef M6_TMC2130_THIGH
+#define M6_TMC2130_THIGH            10                      // 6hth
+#endif
+#ifndef M6_TMC2130_SGT
+#define M6_TMC2130_SGT              4                       // 6sgt
+#endif
+#ifndef M6_TMC2130_TBL
+#define M6_TMC2130_TBL              2                       // 6tbl
+#endif
+#ifndef M6_TMC2130_PWM_GRAD
+#define M6_TMC2130_PWM_GRAD         1                       // 6pgrd
+#endif
+#ifndef M6_TMC2130_PWM_AMPL
+#define M6_TMC2130_PWM_AMPL         200                     // 6pamp
+#endif
+#ifndef M6_TMC2130_HEND
+#define M6_TMC2130_HEND             0                       // 6hend
+#endif
+#ifndef M6_TMC2130_HSTRT
+#define M6_TMC2130_HSTRT            0                       // 6hsrt
+#endif
+#ifndef M6_TMC2130_SMIN
+#define M6_TMC2130_SMIN             5                       // 6smin
+#endif
+#ifndef M6_TMC2130_SMAX
+#define M6_TMC2130_SMAX             5                       // 6smax
+#endif
+#ifndef M6_TMC2130_SUP
+#define M6_TMC2130_SUP              2                       // 6sup
+#endif
+#ifndef M6_TMC2130_SDN
+#define M6_TMC2130_SDN              1                       // 6sdn
+#endif
+// END Generated
 
 //*****************************************************************************
 //*** Axis Settings ***********************************************************
@@ -835,210 +1112,530 @@
 // Set to allow the board to function if not otherwise set up
 // (least disruptive settings)
 
-/* Legend:
-    IO_MODE_DISABLED
+// Set the probing input (universal, all axis probe)
+#ifndef PROBING_INPUT
+#define PROBING_INPUT 0
+#endif
+
+/* Legend of valid options:
+  DIn_ENABLED
+    IO_UNAVAILABLE   // input/output is missing/used/unavailable
+    IO_DISABLED      // input/output is disabled
+    IO_ENABLED       // input/output enabled
+
+  DIn_POLARITY:
     IO_ACTIVE_LOW    aka NORMALLY_OPEN
     IO_ACTIVE_HIGH   aka NORMALLY_CLOSED
 
+  DIn_ACTION:
     INPUT_ACTION_NONE
-    INPUT_ACTION_STOP
-    INPUT_ACTION_FAST_STOP
-    INPUT_ACTION_HALT
-    INPUT_ACTION_RESET
+    INPUT_ACTION_STOP        - stop at normal jerk - preserves positional accuracy
+    INPUT_ACTION_FAST_STOP   - stop at high jerk - preserves positional accuracy
+    INPUT_ACTION_HALT        - stop immediately - not guaranteed to preserve position
+    INPUT_ACTION_CYCLE_START - start / restart cycle after feedhold (RESERVED)
+    INPUT_ACTION_ALARM       - initiate an alarm. stops everything immediately - preserves position
+    INPUT_ACTION_SHUTDOWN    - initiate a shutdown. stops everything immediately - does not preserve position
+    INPUT_ACTION_PANIC       - initiate a panic. stops everything immediately - does not preserve position
+    INPUT_ACTION_RESET       - reset system
 
-    INPUT_FUNCTION_NONE
-    INPUT_FUNCTION_LIMIT
-    INPUT_FUNCTION_INTERLOCK
-    INPUT_FUNCTION_SHUTDOWN
-    INPUT_FUNCTION_PANIC
+    INPUT_ACTION_LIMIT       - limit switch processing
+    INPUT_ACTION_INTERLOCK   - interlock processing
 */
 
 // Xmin on v9 board
-#ifndef DI1_MODE
-#define DI1_MODE                    IO_ACTIVE_LOW     // Normally open
+#ifdef DI1_MODE
+#error DI1_MODE is no longer used, please update your settings file
+#error Use DI1_ENABLED and DI1_POLARITY instead
+#endif
+#ifndef DI1_ENABLED
+#define DI1_ENABLED                 IO_ENABLED
+#endif
+#ifndef DI1_POLARITY
+#define DI1_POLARITY                IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI1_ACTION
 #define DI1_ACTION                  INPUT_ACTION_NONE
 #endif
-#ifndef DI1_FUNCTION
-#define DI1_FUNCTION                INPUT_FUNCTION_NONE
+#ifdef DI1_FUNCTION
+#error DI1_FUNCTION is no longer used, please update your settings file
+#error Use DI1_ACTION instead
+#endif
+#ifndef DI1_EXTERNAL_NUMBER
+#define DI1_EXTERNAL_NUMBER         1
 #endif
 
 // Xmax
-#ifndef DI2_MODE
-#define DI2_MODE                    IO_ACTIVE_LOW     // Normally open
+#ifdef DI2_MODE
+#error DI2_MODE is no longer used, please update your settings file
+#error Use DI2_ENABLED and DI2_POLARITY instead
+#endif
+#ifndef DI2_ENABLED
+#define DI2_ENABLED                 IO_ENABLED
+#endif
+#ifndef DI2_POLARITY
+#define DI2_POLARITY                IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI2_ACTION
 #define DI2_ACTION                  INPUT_ACTION_NONE
 #endif
-#ifndef DI2_FUNCTION
-#define DI2_FUNCTION                INPUT_FUNCTION_NONE
+#ifdef DI2_FUNCTION
+#error DI2_FUNCTION is no longer used, please update your settings file
+#error Use DI2_ACTION instead
+#endif
+#ifndef DI2_EXTERNAL_NUMBER
+#define DI2_EXTERNAL_NUMBER         2
 #endif
 
 // Ymin
-#ifndef DI3_MODE
-#define DI3_MODE                    IO_ACTIVE_LOW     // Normally open
+#ifdef DI3_MODE
+#error DI3_MODE is no longer used, please update your settings file
+#error Use DI3_ENABLED and DI3_POLARITY instead
+#endif
+#ifndef DI3_ENABLED
+#define DI3_ENABLED                 IO_ENABLED
+#endif
+#ifndef DI3_POLARITY
+#define DI3_POLARITY                IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI3_ACTION
 #define DI3_ACTION                  INPUT_ACTION_NONE
 #endif
-#ifndef DI3_FUNCTION
-#define DI3_FUNCTION                INPUT_FUNCTION_NONE
+#ifdef DI3_FUNCTION
+#error DI3_FUNCTION is no longer used, please update your settings file
+#error Use DI3_ACTION instead
+#endif
+#ifndef DI3_EXTERNAL_NUMBER
+#define DI3_EXTERNAL_NUMBER         3
 #endif
 
 // Ymax
-#ifndef DI4_MODE
-#define DI4_MODE                    IO_ACTIVE_LOW     // Normally open
+#ifdef DI4_MODE
+#error DI4_MODE is no longer used, please update your settings file
+#error Use DI4_ENABLED and DI4_POLARITY instead
+#endif
+#ifndef DI4_ENABLED
+#define DI4_ENABLED                 IO_ENABLED
+#endif
+#ifndef DI4_POLARITY
+#define DI4_POLARITY                IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI4_ACTION
 #define DI4_ACTION                  INPUT_ACTION_NONE
 #endif
-#ifndef DI4_FUNCTION
-#define DI4_FUNCTION                INPUT_FUNCTION_NONE
+#ifdef DI4_FUNCTION
+#error DI4_FUNCTION is no longer used, please update your settings file
+#error Use DI4_ACTION instead
+#endif
+#ifndef DI4_EXTERNAL_NUMBER
+#define DI4_EXTERNAL_NUMBER         4
 #endif
 
 // Zmin
-#ifndef DI5_MODE
-#define DI5_MODE                    IO_ACTIVE_LOW     // Normally open
+#ifdef DI5_MODE
+#error DI5_MODE is no longer used, please update your settings file
+#error Use DI5_ENABLED and DI5_POLARITY instead
+#endif
+#ifndef DI5_ENABLED
+#define DI5_ENABLED                 IO_ENABLED
+#endif
+#ifndef DI5_POLARITY
+#define DI5_POLARITY                IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI5_ACTION
 #define DI5_ACTION                  INPUT_ACTION_NONE
 #endif
-#ifndef DI5_FUNCTION
-#define DI5_FUNCTION                INPUT_FUNCTION_PROBE
+#ifdef DI5_FUNCTION
+#error DI5_FUNCTION is no longer used, please update your settings file
+#error Use DI5_ACTION instead
+#endif
+#ifndef DI5_EXTERNAL_NUMBER
+#define DI5_EXTERNAL_NUMBER         5
 #endif
 
 // Zmax
-#ifndef DI6_MODE
-#define DI6_MODE                    IO_ACTIVE_LOW     // Normally open
+#ifdef DI6_MODE
+#error DI6_MODE is no longer used, please update your settings file
+#error Use DI6_ENABLED and DI6_POLARITY instead
+#endif
+#ifndef DI6_ENABLED
+#define DI6_ENABLED                 IO_ENABLED
+#endif
+#ifndef DI6_POLARITY
+#define DI6_POLARITY                IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI6_ACTION
 #define DI6_ACTION                  INPUT_ACTION_NONE
 #endif
-#ifndef DI6_FUNCTION
-#define DI6_FUNCTION                INPUT_FUNCTION_NONE
+#ifdef DI6_FUNCTION
+#error DI6_FUNCTION is no longer used, please update your settings file
+#error Use DI6_ACTION instead
+#endif
+#ifndef DI6_EXTERNAL_NUMBER
+#define DI6_EXTERNAL_NUMBER         6
 #endif
 
 // Amin
-#ifndef DI7_MODE
-#define DI7_MODE                    IO_ACTIVE_LOW     // Normally open
+#ifdef DI7_MODE
+#error DI7_MODE is no longer used, please update your settings file
+#error Use DI7_ENABLED and DI7_POLARITY instead
+#endif
+#ifndef DI7_ENABLED
+#define DI7_ENABLED                 IO_ENABLED
+#endif
+#ifndef DI7_POLARITY
+#define DI7_POLARITY                IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI7_ACTION
 #define DI7_ACTION                  INPUT_ACTION_NONE
 #endif
-#ifndef DI7_FUNCTION
-#define DI7_FUNCTION                INPUT_FUNCTION_NONE
+#ifdef DI7_FUNCTION
+#error DI7_FUNCTION is no longer used, please update your settings file
+#error Use DI7_ACTION instead
+#endif
+#ifndef DI7_EXTERNAL_NUMBER
+#define DI7_EXTERNAL_NUMBER         7
 #endif
 
 // Amax
-#ifndef DI8_MODE
-#define DI8_MODE                    IO_ACTIVE_LOW     // Normally open
+#ifdef DI8_MODE
+#error DI8_MODE is no longer used, please update your settings file
+#error Use DI8_ENABLED and DI8_POLARITY instead
+#endif
+#ifndef DI8_ENABLED
+#define DI8_ENABLED                 IO_ENABLED
+#endif
+#ifndef DI8_POLARITY
+#define DI8_POLARITY                IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI8_ACTION
 #define DI8_ACTION                  INPUT_ACTION_NONE
 #endif
-#ifndef DI8_FUNCTION
-#define DI8_FUNCTION                INPUT_FUNCTION_NONE
+#ifdef DI8_FUNCTION
+#error DI8_FUNCTION is no longer used, please update your settings file
+#error Use DI8_ACTION instead
+#endif
+#ifndef DI8_EXTERNAL_NUMBER
+#define DI8_EXTERNAL_NUMBER         8
 #endif
 
 // Safety line
-#ifndef DI9_MODE
-#define DI9_MODE                    IO_ACTIVE_HIGH     // Normally closed
+#ifdef DI9_MODE
+#error DI9_MODE is no longer used, please update your settings file
+#error Use DI9_ENABLED and DI9_POLARITY instead
+#endif
+#ifndef DI9_ENABLED
+#define DI9_ENABLED                 IO_ENABLED
+#endif
+#ifndef DI9_POLARITY
+#define DI9_POLARITY                IO_ACTIVE_HIGH     // Normally closed
 #endif
 #ifndef DI9_ACTION
 #define DI9_ACTION                  INPUT_ACTION_NONE
 #endif
-#ifndef DI9_FUNCTION
-#define DI9_FUNCTION                INPUT_FUNCTION_NONE
+#ifdef DI9_FUNCTION
+#error DI9_FUNCTION is no longer used, please update your settings file
+#error Use DI9_ACTION instead
+#endif
+#ifndef DI9_EXTERNAL_NUMBER
+#define DI9_EXTERNAL_NUMBER         9
 #endif
 
-#ifndef DI10_MODE
-#define DI10_MODE                   IO_ACTIVE_LOW     // Normally open
+#ifdef DI10_MODE
+#error DI10_MODE is no longer used, please update your settings file
+#error Use DI10_ENABLED and DI10_POLARITY instead
+#endif
+#ifndef DI10_ENABLED
+#define DI10_ENABLED                IO_ENABLED
+#endif
+#ifndef DI10_POLARITY
+#define DI10_POLARITY               IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI10_ACTION
 #define DI10_ACTION                 INPUT_ACTION_NONE
 #endif
-#ifndef DI10_FUNCTION
-#define DI10_FUNCTION               INPUT_FUNCTION_NONE
+#ifdef DI10_FUNCTION
+#error DI10_FUNCTION is no longer used, please update your settings file
+#error Use DI10_ACTION instead
+#endif
+#ifndef DI10_EXTERNAL_NUMBER
+#define DI10_EXTERNAL_NUMBER         10
 #endif
 
-#ifndef DI11_MODE
-#define DI11_MODE                   IO_ACTIVE_LOW     // Normally open
+#ifdef DI11_MODE
+#error DI11_MODE is no longer used, please update your settings file
+#error Use DI11_ENABLED and DI11_POLARITY instead
+#endif
+#ifndef DI11_ENABLED
+#define DI11_ENABLED                IO_ENABLED
+#endif
+#ifndef DI11_POLARITY
+#define DI11_POLARITY               IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI11_ACTION
 #define DI11_ACTION                 INPUT_ACTION_NONE
 #endif
-#ifndef DI11_FUNCTION
-#define DI11_FUNCTION               INPUT_FUNCTION_NONE
+#ifdef DI11_FUNCTION
+#error DI11_FUNCTION is no longer used, please update your settings file
+#error Use DI11_ACTION instead
+#endif
+#ifndef DI11_EXTERNAL_NUMBER
+#define DI11_EXTERNAL_NUMBER         11
 #endif
 
-#ifndef DI12_MODE
-#define DI12_MODE                   IO_ACTIVE_LOW     // Normally open
+#ifdef DI12_MODE
+#error DI12_MODE is no longer used, please update your settings file
+#error Use DI12_ENABLED and DI12_POLARITY instead
+#endif
+#ifndef DI12_ENABLED
+#define DI12_ENABLED                IO_ENABLED
+#endif
+#ifndef DI12_POLARITY
+#define DI12_POLARITY               IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI12_ACTION
 #define DI12_ACTION                 INPUT_ACTION_NONE
 #endif
-#ifndef DI12_FUNCTION
-#define DI12_FUNCTION               INPUT_FUNCTION_NONE
+#ifdef DI12_FUNCTION
+#error DI12_FUNCTION is no longer used, please update your settings file
+#error Use DI12_ACTION instead
+#endif
+#ifndef DI12_EXTERNAL_NUMBER
+#define DI12_EXTERNAL_NUMBER         12
+#endif
+
+
+#ifndef PROBING_INPUT
+#define PROBING_INPUT                Z_HOMING_INPUT // default to the z homing input
 #endif
 
 // DIGITAL OUTPUTS - Currently these are hard-wired to extruders
 
 //Extruder1_PWM
-#ifndef DO1_MODE
-#define DO1_MODE                    IO_ACTIVE_HIGH
+#ifndef DO1_ENABLED
+#define DO1_ENABLED                 IO_ENABLED
+#endif
+#ifndef DO1_POLARITY
+#define DO1_POLARITY                IO_ACTIVE_HIGH
+#endif
+#ifndef DO1_EXTERNAL_NUMBER
+#define DO1_EXTERNAL_NUMBER         1
 #endif
 
 //Extruder2_PWM
-#ifndef DO2_MODE
-#define DO2_MODE                    IO_ACTIVE_HIGH
+#ifndef DO2_ENABLED
+#define DO2_ENABLED                 IO_ENABLED
+#endif
+#ifndef DO2_POLARITY
+#define DO2_POLARITY                IO_ACTIVE_HIGH
+#endif
+#ifndef DO2_EXTERNAL_NUMBER
+#define DO2_EXTERNAL_NUMBER         2
 #endif
 
 //Fan1A_PWM
-#ifndef DO3_MODE
-#define DO3_MODE                    IO_ACTIVE_HIGH
+#ifndef DO3_ENABLED
+#define DO3_ENABLED                 IO_ENABLED
+#endif
+#ifndef DO3_POLARITY
+#define DO3_POLARITY                IO_ACTIVE_HIGH
+#endif
+#ifndef DO3_EXTERNAL_NUMBER
+#define DO3_EXTERNAL_NUMBER         3
 #endif
 
 //Fan1B_PWM
-#ifndef DO4_MODE
-#define DO4_MODE                    IO_ACTIVE_HIGH
+#ifndef DO4_ENABLED
+#define DO4_ENABLED                 IO_ENABLED
+#endif
+#ifndef DO4_POLARITY
+#define DO4_POLARITY                IO_ACTIVE_HIGH
+#endif
+#ifndef DO4_EXTERNAL_NUMBER
+#define DO4_EXTERNAL_NUMBER         4
 #endif
 
-#ifndef DO5_MODE
-#define DO5_MODE                    IO_ACTIVE_HIGH
+#ifndef DO5_ENABLED
+#define DO5_ENABLED                 IO_ENABLED
 #endif
-#ifndef DO6_MODE
-#define DO6_MODE                    IO_ACTIVE_HIGH
+#ifndef DO5_POLARITY
+#define DO5_POLARITY                IO_ACTIVE_HIGH
 #endif
-#ifndef DO7_MODE
-#define DO7_MODE                    IO_ACTIVE_HIGH
+#ifndef DO5_EXTERNAL_NUMBER
+#define DO5_EXTERNAL_NUMBER         5
 #endif
-#ifndef DO8_MODE
-#define DO8_MODE                    IO_ACTIVE_HIGH
+
+#ifndef DO6_ENABLED
+#define DO6_ENABLED                 IO_ENABLED
+#endif
+#ifndef DO6_POLARITY
+#define DO6_POLARITY                IO_ACTIVE_HIGH
+#endif
+#ifndef DO6_EXTERNAL_NUMBER
+#define DO6_EXTERNAL_NUMBER         6
+#endif
+
+#ifndef DO7_ENABLED
+#define DO7_ENABLED                 IO_ENABLED
+#endif
+#ifndef DO7_POLARITY
+#define DO7_POLARITY                IO_ACTIVE_HIGH
+#endif
+#ifndef DO7_EXTERNAL_NUMBER
+#define DO7_EXTERNAL_NUMBER         7
+#endif
+
+#ifndef DO8_ENABLED
+#define DO8_ENABLED                 IO_ENABLED
+#endif
+#ifndef DO8_POLARITY
+#define DO8_POLARITY                IO_ACTIVE_HIGH
+#endif
+#ifndef DO8_EXTERNAL_NUMBER
+#define DO8_EXTERNAL_NUMBER         8
 #endif
 
 //SAFEin (Output) signal
-#ifndef DO9_MODE
-#define DO9_MODE                    IO_ACTIVE_HIGH
+#ifndef DO9_ENABLED
+#define DO9_ENABLED                 IO_ENABLED
+#endif
+#ifndef DO9_POLARITY
+#define DO9_POLARITY                IO_ACTIVE_HIGH
+#endif
+#ifndef DO9_EXTERNAL_NUMBER
+#define DO9_EXTERNAL_NUMBER         9
 #endif
 
-#ifndef DO10_MODE
-#define DO10_MODE                   IO_ACTIVE_HIGH
+#ifndef DO10_ENABLED
+#define DO10_ENABLED                IO_ENABLED
+#endif
+#ifndef DO10_POLARITY
+#define DO10_POLARITY               IO_ACTIVE_HIGH
+#endif
+#ifndef DO10_EXTERNAL_NUMBER
+#define DO10_EXTERNAL_NUMBER         10
 #endif
 
 //Header Bed FET
-#ifndef DO11_MODE
-#define DO11_MODE                   IO_ACTIVE_HIGH
+#ifndef DO11_ENABLED
+#define DO11_ENABLED                IO_ENABLED
+#endif
+#ifndef DO11_POLARITY
+#define DO11_POLARITY               IO_ACTIVE_HIGH
+#endif
+#ifndef DO11_EXTERNAL_NUMBER
+#define DO11_EXTERNAL_NUMBER         11
 #endif
 
 //Indicator_LED
-#ifndef DO12_MODE
-#define DO12_MODE                   IO_ACTIVE_HIGH
+#ifndef DO12_ENABLED
+#define DO12_ENABLED                IO_ENABLED
+#endif
+#ifndef DO12_POLARITY
+#define DO12_POLARITY               IO_ACTIVE_HIGH
+#endif
+#ifndef DO12_EXTERNAL_NUMBER
+#define DO12_EXTERNAL_NUMBER         12
 #endif
 
-#ifndef DO13_MODE
-#define DO13_MODE                   IO_ACTIVE_HIGH
+#ifndef DO13_ENABLED
+#define DO13_ENABLED                IO_ENABLED
 #endif
+#ifndef DO13_POLARITY
+#define DO13_POLARITY               IO_ACTIVE_HIGH
+#endif
+#ifndef DO13_EXTERNAL_NUMBER
+#define DO13_EXTERNAL_NUMBER         13
+#endif
+
+// foind in gpio.h:
+// #ifndef AI1_TYPE
+// #define AI1_TYPE                    AIN_TYPE_DISABLED
+// #endif
+// #ifndef AI1_CIRCUIT
+// #define AI1_CIRCUIT                 AIN_CIRCUIT_DISABLED
+// #endif
+// #ifndef AI1_P1
+// #define AI1_P1                      0.0
+// #endif
+// #ifndef AI1_P2
+// #define AI1_P2                      0.0
+// #endif
+// #ifndef AI1_P3
+// #define AI1_P3                      0.0
+// #endif
+// #ifndef AI1_P4
+// #define AI1_P4                      0.0
+// #endif
+// #ifndef AI1_P5
+// #define AI1_P5                      0.0
+// #endif
+//
+//
+// #ifndef AI2_TYPE
+// #define AI2_TYPE                    AIN_TYPE_DISABLED
+// #endif
+// #ifndef AI2_CIRCUIT
+// #define AI2_CIRCUIT                 AIN_CIRCUIT_DISABLED
+// #endif
+// #ifndef AI2_P1
+// #define AI2_P1                      0.0
+// #endif
+// #ifndef AI2_P2
+// #define AI2_P2                      0.0
+// #endif
+// #ifndef AI2_P3
+// #define AI2_P3                      0.0
+// #endif
+// #ifndef AI2_P4
+// #define AI2_P4                      0.0
+// #endif
+// #ifndef AI2_P5
+// #define AI2_P5                      0.0
+// #endif
+//
+// #ifndef AI3_TYPE
+// #define AI3_TYPE                    AIN_TYPE_DISABLED
+// #endif
+// #ifndef AI3_CIRCUIT
+// #define AI3_CIRCUIT                 AIN_CIRCUIT_DISABLED
+// #endif
+// #ifndef AI3_P1
+// #define AI3_P1                      0.0
+// #endif
+// #ifndef AI3_P2
+// #define AI3_P2                      0.0
+// #endif
+// #ifndef AI3_P3
+// #define AI3_P3                      0.0
+// #endif
+// #ifndef AI3_P4
+// #define AI3_P4                      0.0
+// #endif
+// #ifndef AI3_P5
+// #define AI3_P5                      0.0
+// #endif
+//
+// #ifndef AI4_TYPE
+// #define AI4_TYPE                    AIN_TYPE_DISABLED
+// #endif
+// #ifndef AI4_CIRCUIT
+// #define AI4_CIRCUIT                 AIN_CIRCUIT_DISABLED
+// #endif
+// #ifndef AI4_P1
+// #define AI4_P1                      0.0
+// #endif
+// #ifndef AI4_P2
+// #define AI4_P2                      0.0
+// #endif
+// #ifndef AI4_P3
+// #define AI4_P3                      0.0
+// #endif
+// #ifndef AI4_P4
+// #define AI4_P4                      0.0
+// #endif
+// #ifndef AI4_P5
+// #define AI4_P5                      0.0
+// #endif
 
 // *** PWM Settings *** //
 
@@ -1100,6 +1697,9 @@
 #ifndef H1_DEFAULT_D
 #define H1_DEFAULT_D                400.0
 #endif
+#ifndef H1_DEFAULT_F
+#define H1_DEFAULT_F                0.0
+#endif
 
 #ifndef H2_DEFAULT_ENABLE
 #define H2_DEFAULT_ENABLE           false
@@ -1113,6 +1713,9 @@
 #ifndef H2_DEFAULT_D
 #define H2_DEFAULT_D                400.0
 #endif
+#ifndef H2_DEFAULT_F
+#define H2_DEFAULT_F                0.0
+#endif
 
 #ifndef H3_DEFAULT_ENABLE
 #define H3_DEFAULT_ENABLE           false
@@ -1125,6 +1728,9 @@
 #endif
 #ifndef H3_DEFAULT_D
 #define H3_DEFAULT_D                400.0
+#endif
+#ifndef H3_DEFAULT_F
+#define H3_DEFAULT_F                0.0
 #endif
 
 // *** DEFAULT COORDINATE SYSTEM OFFSETS ***

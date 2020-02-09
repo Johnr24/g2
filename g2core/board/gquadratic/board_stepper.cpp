@@ -3,8 +3,8 @@
  * For: /board/gQuadratic
  * This file is part of the g2core project
  *
- * Copyright (c) 2016 - 2018 Alden S. Hart, Jr.
- * Copyright (c) 2016 - 2018 Robert Giseburt
+ * Copyright (c) 2016 - 2019 Alden S. Hart, Jr.
+ * Copyright (c) 2016 - 2019 Robert Giseburt
  *
  * This file ("the software") is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2 as published by the
@@ -29,28 +29,48 @@
 
 #include "board_stepper.h"
 
-// These are identical to board_stepper.h, except for the word "extern", and they have the initialization parameters
-StepDirStepper<Motate::kSocket1_StepPinNumber,
+// These are identical to board_stepper.h, except for the word "extern"
+#if QUADRATIC_REVISION == 'B'
+HOT_DATA StepDirStepper<Motate::kSocket1_StepPinNumber,
                Motate::kSocket1_DirPinNumber,
                Motate::kSocket1_EnablePinNumber,
                Motate::kSocket1_Microstep_0PinNumber,
                Motate::kSocket1_Microstep_1PinNumber,
                Motate::kSocket1_Microstep_2PinNumber,
                Motate::kSocket1_VrefPinNumber>
-    motor_1{M1_STEP_POLARITY, M1_ENABLE_POLARITY};
+    motor_1 {};
 
-StepDirStepper<Motate::kSocket2_StepPinNumber,
+HOT_DATA StepDirStepper<Motate::kSocket2_StepPinNumber,
                Motate::kSocket2_DirPinNumber,
                Motate::kSocket2_EnablePinNumber,
                Motate::kSocket2_Microstep_0PinNumber,
                Motate::kSocket2_Microstep_1PinNumber,
                Motate::kSocket2_Microstep_2PinNumber,
                Motate::kSocket2_VrefPinNumber>
-    motor_2{M2_STEP_POLARITY, M2_ENABLE_POLARITY};
+    motor_2 {};
+#endif // QUADRATIC_REVISION == 'B'
 
-StepDirHobbyServo<Motate::kServo1_PinNumber> motor_3;
+#if QUADRATIC_REVISION == 'C'
+// Motate::SPIChipSelectPin<Motate::kSocket3_SPISlaveSelectPinNumber> motor_1_cs;
+HOT_DATA Trinamic2130<SPIBus_used_t::SPIBusDevice,
+             Motate::kSocket1_StepPinNumber,
+             Motate::kSocket1_DirPinNumber,
+             Motate::kSocket1_EnablePinNumber>
+    motor_1 {spiBus, Motate::SPIChipSelectPin<Motate::kSocket1_SPISlaveSelectPinNumber>{}};
 
-Stepper* Motors[MOTORS] = {&motor_1, &motor_2, &motor_3};
+// Motate::SPIChipSelectPin<Motate::kSocket4_SPISlaveSelectPinNumber> motor_2_cs;
+HOT_DATA Trinamic2130<SPIBus_used_t::SPIBusDevice,
+             Motate::kSocket2_StepPinNumber,
+             Motate::kSocket2_DirPinNumber,
+             Motate::kSocket2_EnablePinNumber>
+    motor_2 {spiBus, Motate::SPIChipSelectPin<Motate::kSocket2_SPISlaveSelectPinNumber>{}};
+#endif // QUADRATIC_REVISION == 'C'
+
+
+HOT_DATA StepDirHobbyServo<Motate::kServo1_PinNumber> motor_3;
+
+
+Stepper* const Motors[MOTORS] = {&motor_1, &motor_2, &motor_3};
 
 void board_stepper_init() {
     for (uint8_t motor = 0; motor < MOTORS; motor++) { Motors[motor]->init(); }
