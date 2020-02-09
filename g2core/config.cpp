@@ -2,7 +2,7 @@
  * config.cpp - application independent configuration handling
  * This file is part of the g2core project
  *
- * Copyright (c) 2010 - 2019 Alden S. Hart, Jr.
+ * Copyright (c) 2010 - 2018 Alden S. Hart, Jr.
  *
  * This file ("the software") is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2 as published by the
@@ -114,23 +114,7 @@ void config_init()
     nvObj_t *nv = nv_reset_nv_list();
     config_init_assertions();
     js.json_mode = JSON_MODE;                    // initial value until persistence is read
-
-    cm_set_units_mode(MILLIMETERS);             // must do inits in millimeter mode
-    nv->index = 0;                              // this will read the first record in NVM
-
-    read_persistent_value(nv);
-    if (fp_NE(nv->value_flt, G2CORE_FIRMWARE_BUILD)) {   // case (1) NVM is not setup or not in revision
-        _set_defa(nv, false);
-    } else {
-        for (nv->index=0; nv_index_is_single(nv->index); nv->index++) {
-            if (GET_TABLE_BYTE(flags) & F_INITIALIZE) {
-                strncpy(nv->token, cfgArray[nv->index].token, TOKEN_LEN); // read the token from the array
-                read_persistent_value(nv);
-                nv_set(nv);
-            }
-        }
-        sr_init_status_report();                    // reset status reports
-    }
+    _set_defa(nv, false);
     rpt_print_loading_configs_message();
 }
 
@@ -144,22 +128,17 @@ static void _set_defa(nvObj_t *nv, bool print)
     cm_set_units_mode(MILLIMETERS);             // must do inits in MM mode
     for (nv->index=0; nv_index_is_single(nv->index); nv->index++) {
         if (cfgArray[nv->index].flags & F_INITIALIZE) {
-            auto type = cfgArray[nv->index].flags & F_TYPE_MASK;
-            if ((type == TYPE_INTEGER) || (type == TYPE_DATA)) {
-                nv->valuetype = TYPE_INTEGER;
-                nv->value_int = cfgArray[nv->index].def_value;
-            } else if (type == TYPE_BOOLEAN) {
-                nv->valuetype = TYPE_BOOLEAN;
+            if ((cfgArray[nv->index].flags & TYPE_INTEGER) ||
+                (cfgArray[nv->index].flags & TYPE_BOOLEAN)) {    // Fix for Issue #357
                 nv->value_int = cfgArray[nv->index].def_value;
             } else {
-                nv->valuetype = TYPE_FLOAT;
                 nv->value_flt = cfgArray[nv->index].def_value;
             }
             strncpy(nv->token, cfgArray[nv->index].token, TOKEN_LEN);
             cfgArray[nv->index].set(nv);        // run the set method, nv_set(nv);
-            if (nv->index == 0 || cfgArray[nv->index].flags & F_PERSIST) {
-                 nv_persist(nv);
-            }
+            if (cfgArray[nv->index].flags & F_PERSIST) {
+                nv_persist(nv);
+            }            
         }
     }
     sr_init_status_report();                    // reset status reports
@@ -171,7 +150,7 @@ static void _set_defa(nvObj_t *nv, bool print)
 stat_t set_defaults(nvObj_t *nv)
 {
     // failsafe. nv->value_int must be true or no action occurs
-    if (!nv->value_int) {
+    if (!nv->value_int) { 
         return(help_defa(nv));
     }
     _set_defa(nv, true);
@@ -245,7 +224,8 @@ stat_t get_flt(nvObj_t *nv)
 
 stat_t get_data(nvObj_t *nv)
 {
-    nv->value_int = *((uint32_t *)GET_TABLE_WORD(target));
+    uint32_t *v = (uint32_t*)&nv->value_flt;
+    *v = *((uint32_t *)GET_TABLE_WORD(target));
     nv->valuetype = TYPE_DATA;
     return (STAT_OK);
 }
@@ -260,14 +240,8 @@ stat_t get_data(nvObj_t *nv)
  */
 
 stat_t set_noop(nvObj_t *nv) {
-    // we call this for msg to parrot back the string
-    // check for string type and pass-through
-    if (cfgArray[nv->index].flags & TYPE_STRING) {
-        nv->valuetype = TYPE_STRING;
-    } else {
-        nv->valuetype = TYPE_NULL;
-    }
-    return (STAT_OK);  // hack until JSON is refactored
+    nv->valuetype = TYPE_NULL;
+    return (STAT_OK);                       // hack until JSON is refactored
 }
 
 stat_t set_nul(nvObj_t *nv) {
@@ -277,10 +251,10 @@ stat_t set_nul(nvObj_t *nv) {
 
 stat_t set_ro(nvObj_t *nv) {
     if (strcmp(nv_body->token, "sr") == 0) { // hack. If setting an SR it doesn't fail
-        return (STAT_OK);
+        return (STAT_OK); 
     }
     nv->valuetype = TYPE_NULL;
-    return (STAT_PARAMETER_IS_READ_ONLY);
+    return (STAT_PARAMETER_IS_READ_ONLY); 
 }
 
 stat_t set_int32(nvObj_t *nv)
@@ -300,7 +274,7 @@ stat_t set_flt(nvObj_t *nv)
 
 stat_t set_data(nvObj_t *nv)
 {
-    uint32_t *v = (uint32_t*)&nv->value_int;
+    uint32_t *v = (uint32_t*)&nv->value_flt;
     *((uint32_t *)GET_TABLE_WORD(target)) = *v;
     nv->valuetype = TYPE_DATA;
     return(STAT_OK);
@@ -406,37 +380,27 @@ stat_t set_grp(nvObj_t *nv)
  */
 index_t nv_get_index(const char *group, const char *token)
 {
-    return cfgArray.getIndex(group, token);
-    // char c;
-    // char str[TOKEN_LEN + GROUP_LEN+1];    // should actually never be more than TOKEN_LEN+1
-    // strncpy(str, group, GROUP_LEN+1);
-    // strncat(str, token, TOKEN_LEN+1);
+    char c;
+    char str[TOKEN_LEN + GROUP_LEN+1];    // should actually never be more than TOKEN_LEN+1
+    strncpy(str, group, GROUP_LEN+1);
+    strncat(str, token, TOKEN_LEN+1);
 
-    // index_t i;
-    // index_t index_max = nv_index_max();
+    index_t i;
+    index_t index_max = nv_index_max();
 
-    // for (i=0; i < index_max; i++) {
-    //     auto config = cfgArray[i];
-    //     if ((c = config.token[0]) != str[0]) { continue; }                  // 1st character mismatch
-    //     if ((c = config.token[1]) == NUL) { if (str[1] == NUL) return(i); } // one character match
-    //     if (c != str[1]) continue;                                          // 2nd character mismatch
-    //     if ((c = config.token[2]) == NUL) { if (str[2] == NUL) return(i); } // two character match
-    //     if (c != str[2]) continue;                                          // 3rd character mismatch
-    //     if ((c = config.token[3]) == NUL) { if (str[3] == NUL) return(i); } // three character match
-    //     if (c != str[3]) continue;                                          // 4th character mismatch
-    //     if ((c = config.token[4]) == NUL) { if (str[4] == NUL) return(i); } // four character match
-    //     if (c != str[4]) continue;                                          // 5th character mismatch
-    //     if ((c = config.token[5]) == NUL) { if (str[5] == NUL) return(i); } // four character match
-    //     if (c != str[5]) continue;                                          // 6th character mismatch
-    //     if ((c = config.token[6]) == NUL) { if (str[6] == NUL) return(i); } // four character match
-    //     if (c != str[6]) continue;                                          // 7th character mismatch
-    //     if ((c = config.token[7]) == NUL) { if (str[7] == NUL) return(i); } // four character match
-    //     if (c != str[7]) continue;                                          // 8th character mismatch
-    //     if ((c = config.token[8]) == NUL) { if (str[8] == NUL) return(i); } // four character match
-    //     if (c != str[8]) continue;                                          // 9th character mismatch
-    //     return (i);                                                         // five character match
-    // }
-    // return (NO_MATCH);
+    for (i=0; i < index_max; i++) {
+        if ((c = GET_TOKEN_BYTE(token[0])) != str[0]) {    continue; }              // 1st character mismatch
+        if ((c = GET_TOKEN_BYTE(token[1])) == NUL) { if (str[1] == NUL) return(i);} // one character match
+        if (c != str[1]) continue;                                                  // 2nd character mismatch
+        if ((c = GET_TOKEN_BYTE(token[2])) == NUL) { if (str[2] == NUL) return(i);} // two character match
+        if (c != str[2]) continue;                                                  // 3rd character mismatch
+        if ((c = GET_TOKEN_BYTE(token[3])) == NUL) { if (str[3] == NUL) return(i);} // three character match
+        if (c != str[3]) continue;                                                  // 4th character mismatch
+        if ((c = GET_TOKEN_BYTE(token[4])) == NUL) { if (str[4] == NUL) return(i);} // four character match
+        if (c != str[4]) continue;                                                  // 5th character mismatch
+        return (i);                                                                 // five character match
+    }
+    return (NO_MATCH);
 }
 
 /*
@@ -463,19 +427,20 @@ uint8_t nv_get_type(nvObj_t *nv)
 
 void nv_coerce_types(nvObj_t *nv)
 {
-    if (nv->valuetype == TYPE_NULL) {  // don't change type if it's a GET query
+    if (nv->valuetype == TYPE_NULL) {               // don't change type if it's a GET query
         return;
     }
     valueType type = (valueType)(cfgArray[nv->index].flags & F_TYPE_MASK);
     if (type == TYPE_INTEGER) {
-        nv->valuetype = TYPE_INTEGER;   // will pay attention to the int value, not the float
-    } else if (type == TYPE_BOOLEAN) {  // it may have been marked as a boolean, but if it's not...
+        nv->valuetype = TYPE_INTEGER;               // will pay attention to the int value, not the float
+    } else if (type == TYPE_BOOLEAN) {              // it may have been marked as a boolean, but if it's not...
+        nv->valuetype = TYPE_BOOLEAN;
         if (nv->valuetype == TYPE_INTEGER) {
             nv->value_int = nv->value_int ? true : false;
-        } else if (nv->valuetype == TYPE_FLOAT) {
+    } else
+        if (nv->valuetype == TYPE_FLOAT) {
             nv->value_int = (fp_ZERO(nv->value_flt)) ? true : false;
         }
-        nv->valuetype = TYPE_BOOLEAN;
     }
 }
 
@@ -609,7 +574,7 @@ nvObj_t *nv_add_object(const char *token)       // add an object to the body usi
         if (nv->valuetype != TYPE_EMPTY) {
             if ((nv = nv->nx) == NULL) {        // not supposed to find a NULL; here for safety
                 return(NULL);
-            }
+            }            
             continue;
         }
         // load the index from the token or die trying
@@ -626,7 +591,7 @@ nvObj_t *nv_add_integer(const char *token, const int32_t value) // add an intege
     for (uint8_t i=0; i<NV_BODY_LEN; i++) {
         if (nv->valuetype != TYPE_EMPTY) {
             if ((nv = nv->nx) == NULL) {        // not supposed to find a NULL; here for safety
-                return(NULL);
+                return(NULL); 
             }
             continue;
         }
@@ -638,18 +603,19 @@ nvObj_t *nv_add_integer(const char *token, const int32_t value) // add an intege
     return (NULL);
 }
 
-nvObj_t *nv_add_data(const char *token, const uint32_t value)// add an data object to the body
+nvObj_t *nv_add_data(const char *token, const uint32_t value)// add an integer object to the body
 {
     nvObj_t *nv = nv_body;
     for (uint8_t i=0; i<NV_BODY_LEN; i++) {
         if (nv->valuetype != TYPE_EMPTY) {
             if ((nv = nv->nx) == NULL) {        // not supposed to find a NULL; here for safety
-                 return(NULL);
-            }
+                 return(NULL); 
+            }            
             continue;
         }
         strcpy(nv->token, token);
-        nv->value_int = value;
+        float *v = (float*)&value;
+        nv->value_flt = *v;
         nv->valuetype = TYPE_DATA;
         return (nv);
     }
@@ -663,7 +629,7 @@ nvObj_t *nv_add_float(const char *token, const float value)    // add a float ob
         if (nv->valuetype != TYPE_EMPTY) {
             if ((nv = nv->nx) == NULL) {        // not supposed to find a NULL; here for safety
                 return(NULL);
-            }
+            }            
             continue;
         }
         strncpy(nv->token, token, TOKEN_LEN);
@@ -680,8 +646,8 @@ nvObj_t *nv_add_string(const char *token, const char *string) // add a string ob
     for (uint8_t i=0; i<NV_BODY_LEN; i++) {
         if (nv->valuetype != TYPE_EMPTY) {
             if ((nv = nv->nx) == NULL) {        // not supposed to find a NULL; here for safety
-                return(NULL);
-            }
+                return(NULL); 
+            }            
             continue;
         }
         strncpy(nv->token, token, TOKEN_LEN);
@@ -736,7 +702,7 @@ void nv_print_list(stat_t status, uint8_t text_flags, uint8_t json_flags)
 
 void nv_dump_nv(nvObj_t *nv)
 {
-    sprintf (cs.out_buf, "i:%ld, d:%d, t:%d, p:%d, v:%f, g:%s, t:%s, s:%s\n",
+    sprintf (cs.out_buf, "i:%d, d:%d, t:%d, p:%d, v:%f, g:%s, t:%s, s:%s\n",
             nv->index,
             nv->depth,
             nv->valuetype,

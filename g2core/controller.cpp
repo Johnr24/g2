@@ -2,8 +2,8 @@
  * controller.cpp - g2core controller and top level parser
  * This file is part of the g2core project
  *
- * Copyright (c) 2010 - 2019 Alden S. Hart, Jr.
- * Copyright (c) 2013 - 2019 Robert Giseburt
+ * Copyright (c) 2010 - 2018 Alden S. Hart, Jr.
+ * Copyright (c) 2013 - 2018 Robert Giseburt
  *
  * This file ("the software") is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2 as published by the
@@ -45,8 +45,6 @@
 #include "util.h"
 #include "xio.h"
 #include "settings.h"
-#include "persistence.h"
-#include "safety_manager.h"
 
 #include "MotatePower.h"
 
@@ -66,7 +64,8 @@ controller_t cs;        // controller state structure
 
 static void _controller_HSM(void);
 static stat_t _led_indicator(void);             // twiddle the LED indicator
-static stat_t _safety_handler(void);          // new (replaces _interlock_estop_handler)
+static stat_t _shutdown_handler(void);          // new (replaces _interlock_estop_handler)
+static stat_t _interlock_handler(void);         // new (replaces _interlock_estop_handler)
 static stat_t _limit_switch_handler(void);      // revised for new GPIO code
 
 static void _init_assertions(void);
@@ -82,22 +81,9 @@ static stat_t _controller_state(void);          // manage controller state trans
 
 static Motate::OutputPin<Motate::kOutputSAFE_PinNumber> safe_pin;
 
-gpioDigitalInputHandler _limit_input_handler {
-    [&](const bool state, const inputEdgeFlag edge, const uint8_t triggering_pin_number) {
-        if (edge != INPUT_EDGE_LEADING) { return GPIO_NOT_HANDLED; }
-
-        cm->limit_requested = triggering_pin_number;
-
-        return GPIO_NOT_HANDLED;  // allow others to see this notice
-    },
-    5,    // priority
-    nullptr // next - nullptr to start with
-};
-
-
-/***********************************************************************************
- **** CODE *************************************************************************
- ***********************************************************************************/
+/****************************************************************************************
+ **** CODE ******************************************************************************
+ ****************************************************************************************/
 /*
  * controller_init() - controller init
  */
@@ -119,10 +105,6 @@ void controller_init()
         cs.controller_state = CONTROLLER_CONNECTED;
     }
 //  IndicatorLed.setFrequency(100000);
-
-    din_handlers[INPUT_ACTION_LIMIT].registerHandler(&_limit_input_handler);
-
-    safety_manager->init();
 }
 
 void controller_request_enquiry()
@@ -169,7 +151,8 @@ static void _controller_HSM()
 
     DISPATCH(hardware_periodic());              // give the hardware a chance to do stuff
     DISPATCH(_led_indicator());                 // blink LEDs at the current rate
-    DISPATCH(_safety_handler());              // invoke shutdown
+    DISPATCH(_shutdown_handler());              // invoke shutdown
+    DISPATCH(_interlock_handler());             // invoke / remove safety interlock
     DISPATCH(temperature_callback());           // makes sure temperatures are under control
     DISPATCH(_limit_switch_handler());          // invoke limit switch
     DISPATCH(_controller_state());              // controller state management
@@ -196,7 +179,6 @@ static void _controller_HSM()
 #if MARLIN_COMPAT_ENABLED == true
     DISPATCH(marlin_callback());                // handle Marlin stuff - may return EAGAIN, must be after planner_callback!
 #endif
-    DISPATCH(write_persistent_values_callback());
 
 //----- command readers and parsers --------------------------------------------------//
 
@@ -219,7 +201,7 @@ static void _controller_HSM()
 
 static stat_t _dispatch_control()
 {
-    if (cs.controller_state == CONTROLLER_READY) {
+    if (cs.controller_state != CONTROLLER_PAUSED) {
         devflags_t flags = DEV_IS_CTRL;
         if ((cs.bufp = xio_readline(flags, cs.linelen)) != NULL) {
             _dispatch_kernel(flags);
@@ -230,7 +212,7 @@ static stat_t _dispatch_control()
 
 static stat_t _dispatch_command()
 {
-    if (cs.controller_state == CONTROLLER_READY) {
+    if (cs.controller_state != CONTROLLER_PAUSED) {
         devflags_t flags = DEV_IS_BOTH | DEV_IS_MUTED; // expressly state we'll handle muted devices
         if ((!mp_planner_is_full(mp)) && (cs.bufp = xio_readline(flags, cs.linelen)) != NULL) {
             _dispatch_kernel(flags);
@@ -320,7 +302,7 @@ static void _dispatch_kernel(const devflags_t flags)
         nv_copy_string(nv, cs.bufp);                        // copy the Gcode line
         nv->valuetype = TYPE_STRING;
         status = gcode_parser(cs.bufp);
-
+        
 #if MARLIN_COMPAT_ENABLED == true
         if (js.json_mode == MARLIN_COMM_MODE) {             // in case a marlin-specific M-code was found
             cs.comm_request_mode = MARLIN_COMM_MODE;        // mode of this command
@@ -346,9 +328,6 @@ void _reset_comms_mode() {
     // reset the communications mode
     cs.comm_mode = COMM_MODE;
     js.json_mode = (COMM_MODE < AUTO_MODE) ? COMM_MODE : JSON_MODE;
-#if MARLIN_COMPAT_ENABLED == true
-    mst.marlin_flavor = false;
-#endif
     sr.status_report_verbosity = STATUS_REPORT_VERBOSITY;
     qr.queue_report_verbosity = QUEUE_REPORT_VERBOSITY;
 }
@@ -362,7 +341,7 @@ static stat_t _controller_state()
 {
     if (cs.controller_state == CONTROLLER_CONNECTED) {        // first time through after reset
         cs.controller_state = CONTROLLER_STARTUP;
-
+        
         // This is here just to put a small delay in before the startup message.
 #if MARLIN_COMPAT_ENABLED == true
         // For Marlin compatibility, we need this to be long enough for the UI to say something and reveal
@@ -371,15 +350,12 @@ static stat_t _controller_state()
             // xio_connected will only return true for USB and other non-permanent connections
             _connection_timeout.set(2000);
         } else {
-            _connection_timeout.set(10);
+            _connection_timeout.set(1);
         }
 #else
-        _connection_timeout.set(1);
+        _connection_timeout.set(10);
 #endif
-    }
-
-    // first time through after reset
-    if ((cs.controller_state == CONTROLLER_STARTUP) && (!_connection_timeout.isSet() || _connection_timeout.isPast())) {
+    } else if ((cs.controller_state == CONTROLLER_STARTUP) && (_connection_timeout.isPast())) {        // first time through after reset
         if (MARLIN_COMM_MODE != js.json_mode) { // MARLIN_COMM_MODE is always defined, just not always used
             _reset_comms_mode();
         }
@@ -460,8 +436,8 @@ static stat_t _led_indicator()
         cs.led_blink_rate =  blink_rate;
         cs.led_timer = 0;
     }
-    if (SysTickTimer.getValue() > cs.led_timer) {
-        cs.led_timer = SysTickTimer.getValue() + cs.led_blink_rate;
+    if (SysTickTimer_getValue() > cs.led_timer) {
+        cs.led_timer = SysTickTimer_getValue() + cs.led_blink_rate;
         IndicatorLed.toggle();
     }
     return (STAT_OK);
@@ -487,8 +463,9 @@ static stat_t _sync_to_planner()
 /****************************************************************************************
  * ALARM STATE HANDLERS
  *
- * _safety_handler() - handle safety stuff like shutdown and interlock
+ * _shutdown_handler() - put system into shutdown state
  * _limit_switch_handler() - shut down system if limit switch fired
+ * _interlock_handler() - feedhold and resume depending on edge
  *
  *    Some handlers return EAGAIN causing the control loop to never advance beyond that point.
  *
@@ -497,17 +474,22 @@ static stat_t _sync_to_planner()
  *   - safety_interlock_requested == INPUT_EDGE_LEADING is interlock onset
  *   - safety_interlock_requested == INPUT_EDGE_TRAILING is interlock offset
  */
-static stat_t _safety_handler(void)
+static stat_t _shutdown_handler(void)
 {
-    safety_manager->periodic_handler();
+    if (cm->shutdown_requested != 0) {  // request may contain the (non-zero) input number
+        char msg[10];
+        sprintf(msg, "input %d", (int)cm->shutdown_requested);
+        cm->shutdown_requested = false; // clear limit request used here ^
+        cm_shutdown(STAT_SHUTDOWN, msg);
+    }
     return(STAT_OK);
 }
 
 static stat_t _limit_switch_handler(void)
 {
     auto machine_state = cm_get_machine_state();
-    if ((machine_state != MACHINE_ALARM) &&
-        (machine_state != MACHINE_PANIC) &&
+    if ((machine_state != MACHINE_ALARM) && 
+        (machine_state != MACHINE_PANIC) && 
         (machine_state != MACHINE_SHUTDOWN)) {
         safe_pin.toggle();
     }
@@ -518,6 +500,30 @@ static stat_t _limit_switch_handler(void)
         cm_alarm(STAT_LIMIT_SWITCH_HIT, msg);
     }
     return (STAT_OK);
+}
+
+static stat_t _interlock_handler(void)
+{
+    if (cm->safety_interlock_enable) {
+    // interlock broken
+        if (cm->safety_interlock_disengaged != 0) {
+            cm->safety_interlock_disengaged = 0;
+            cm->safety_interlock_state = SAFETY_INTERLOCK_DISENGAGED;
+            cm_request_feedhold(FEEDHOLD_TYPE_ACTIONS, FEEDHOLD_EXIT_INTERLOCK);  // may have already requested STOP as INPUT_ACTION
+            // feedhold was initiated by input action in gpio
+            // pause spindle
+            // pause coolant
+        }
+
+        // interlock restored
+        if ((cm->safety_interlock_reengaged != 0) && (mp_runtime_is_idle())) {
+            cm->safety_interlock_reengaged = 0;
+            cm->safety_interlock_state = SAFETY_INTERLOCK_ENGAGED;  // interlock restored
+//            cm_request_exit_hold();                                 // use cm_request_exit_hold() instead of just ending +++++
+            cm_request_cycle_start();                               // proper way to restart the cycle
+        }
+    }
+    return(STAT_OK);
 }
 
 /****************************************************************************************
@@ -554,3 +560,5 @@ stat_t _test_system_assertions()
     xio_test_assertions();
     return (STAT_OK);
 }
+
+    

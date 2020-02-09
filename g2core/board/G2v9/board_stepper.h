@@ -88,8 +88,6 @@ extern StepDirStepper<Motate::kSocket4_StepPinNumber,
 
 extern Stepper* Motors[MOTORS];
 
-extern ExternalEncoder* const ExternalEncoders[0];
-
 void board_stepper_init();
 
 #endif  // BOARD_STEPPER_H_ONCE

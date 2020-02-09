@@ -32,7 +32,6 @@
 #include "canonical_machine.h"
 #include "planner.h"
 #include "util.h"
-#include "report.h"
 #include "xio.h"
 
 #define JOGGING_START_VELOCITY ((float)10.0)
@@ -112,7 +111,6 @@ stat_t cm_jogging_cycle_start(uint8_t axis) {
 
     cm->machine_state = MACHINE_CYCLE;
     cm->cycle_type = CYCLE_JOG;
-    sr_request_status_report(SR_REQUEST_IMMEDIATE);
     return (STAT_OK);
 }
 
@@ -156,7 +154,7 @@ static stat_t _jogging_axis_start(int8_t axis) {
 static stat_t _jogging_axis_ramp_jog(int8_t axis)  // run the jog ramp
 {
     float   direction = jog.start_pos <= jog.dest_pos ? 1. : -1.;
-    float   delta     = std::abs(jog.dest_pos - jog.start_pos);
+    float   delta     = fabs(jog.dest_pos - jog.start_pos);
     uint8_t last      = 0;
 
     float velocity =

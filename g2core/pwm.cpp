@@ -2,7 +2,7 @@
  * pwm.cpp - pulse width modulation drivers
  * This file is part of the g2core project
  *
- * Copyright (c) 2012 - 2019 Alden S. Hart, Jr.
+ * Copyright (c) 2012 - 2018 Alden S. Hart, Jr.
  *
  * This file ("the software") is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2 as published by the
@@ -25,11 +25,9 @@
  * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#if 0
 #include "g2core.h"  // #1
 #include "config.h"  // #2
 #include "hardware.h"
-#include "gpio.h"
 #include "spindle.h"
 #include "text_parser.h"
 #include "pwm.h"
@@ -41,20 +39,9 @@
 pwmControl_t pwm;
 
 
-gpioDigitalOutput *spindle_pwm_output = nullptr;
-gpioDigitalOutput *secondary_pwm_output = nullptr;
-
-#ifndef SPINDLE_PWM_NUMBER
-#warning SPINDLE_PWM_NUMBER is defaulted to 6!
-#warning SPINDLE_PWM_NUMBER should be defined in settings or a board file!
-#define SPINDLE_PWM_NUMBER 6
-#endif
-
-#ifndef SECONDARY_PWM_OUTPUT_NUMBER
-#warning SECONDARY_PWM_OUTPUT_NUMBER is defaulted to 0 (off)!
-#warning SECONDARY_PWM_OUTPUT_NUMBER should be defined in settings or a board file!
-#define SECONDARY_PWM_OUTPUT_NUMBER 0
-#endif
+// Setup motate PWM pins
+Motate::PWMOutputPin<Motate::kSpindle_PwmPinNumber>  spindle_pwm_pin {Motate::kNormal, P1_PWM_FREQUENCY};
+Motate::PWMOutputPin<Motate::kSpindle_Pwm2PinNumber> secondary_pwm_pin {Motate::kNormal, P1_PWM_FREQUENCY}; // assume the same frequency, to start with at least
 
 /***** PWM code *****/
 /*
@@ -66,17 +53,7 @@ gpioDigitalOutput *secondary_pwm_output = nullptr;
  *    - See system.h for timer and port assignments
  *  - Don't do this: memset(&TIMER_PWM1, 0, sizeof(PWM_TIMER_t)); // zero out the timer registers
  */
-void pwm_init() {
-    if (SPINDLE_PWM_NUMBER > 0) {
-        spindle_pwm_output = d_out[SPINDLE_PWM_NUMBER-1];
-        spindle_pwm_output->setFrequency(P1_PWM_FREQUENCY);
-
-    }
-    if (SECONDARY_PWM_OUTPUT_NUMBER > 0) {
-        secondary_pwm_output = d_out[SECONDARY_PWM_OUTPUT_NUMBER-1];
-        secondary_pwm_output->setFrequency(P1_PWM_FREQUENCY);
-    }
-}
+void pwm_init() {}
 
 /*
  * pwm_set_freq() - set PWM channel frequency
@@ -95,13 +72,9 @@ stat_t pwm_set_freq(uint8_t chan, float freq)
     //if (freq > PWM_MAX_FREQ) { return (STAT_INPUT_EXCEEDS_MAX_VALUE);}
 
     if (chan == PWM_1) {
-        if (spindle_pwm_output != nullptr) {
-            spindle_pwm_output->setFrequency(freq);
-        }
+        spindle_pwm_pin.setFrequency(freq);
     } else if (chan == PWM_2) {
-        if (secondary_pwm_output != nullptr) {
-            secondary_pwm_output->setFrequency(freq);
-        }
+        secondary_pwm_pin.setFrequency(freq);
     }
 
     return (STAT_OK);
@@ -126,13 +99,15 @@ stat_t pwm_set_duty(uint8_t chan, float duty)
     if (duty > 1.0) { return (STAT_INPUT_EXCEEDS_MAX_VALUE);}
 
     if (chan == PWM_1) {
-        if (spindle_pwm_output != nullptr) {
-            spindle_pwm_output->setValue(duty);
-        }
+//        if (spindle_pwm_pin.isNull()) {
+//            cm_alarm(STAT_ALARM, "attempt to turn on a non-existent spindle");
+//        }
+        spindle_pwm_pin = duty;
     } else if (chan == PWM_2) {
-        if (secondary_pwm_output != nullptr) {
-            secondary_pwm_output->setValue(duty);
-        }
+//        if (secondary_pwm_pin.isNull()) {
+//            cm_alarm(STAT_ALARM, "attempt to turn on a non-existent spindle");
+//        }
+        secondary_pwm_pin = duty;
     }
 
     return (STAT_OK);
@@ -185,4 +160,3 @@ void pwm_print_p1wph(nvObj_t *nv) { text_print(nv, fmt_p1wph);}
 void pwm_print_p1pof(nvObj_t *nv) { text_print(nv, fmt_p1pof);}
 
 #endif //__TEXT_MODE
-#endif // 0

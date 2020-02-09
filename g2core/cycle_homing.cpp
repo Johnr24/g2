@@ -2,8 +2,8 @@
  * cycle_homing.cpp - homing cycle extension to canonical_machine
  * This file is part of the g2core project
  *
- * Copyright (c) 2010 - 2019 Alden S. Hart, Jr.
- * Copyright (c) 2013 - 2019 Robert Giseburt
+ * Copyright (c) 2010 - 2018 Alden S. Hart, Jr.
+ * Copyright (c) 2013 - 2018 Robert Giseburt
  *
  * This file ("the software") is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2 as published by the
@@ -85,35 +85,6 @@ static stat_t _homing_axis_move(int8_t axis, float target, float velocity);
 static stat_t _homing_error_exit(int8_t axis, stat_t status);
 static stat_t _homing_finalize_exit(int8_t axis);
 static int8_t _get_next_axis(int8_t axis);
-static void _homing_axis_move_callback(float* vect, bool* flag);
-
-/**** HELPERS ***************************************************************************
- * _set_homing_func() - a convenience for setting the next dispatch vector and exiting
- */
-
-static stat_t _set_homing_func(stat_t (*func)(int8_t axis)) {
-    hm.func = func;
-    return (STAT_EAGAIN);
-}
-
-/*
- * _homing_handler - a gpioDigitalInputHandler to capture pin change events
- *   Will be registered only during homing mode - see gpio.h for more info
- */
-gpioDigitalInputHandler _homing_handler {
-    [&](const bool state, const inputEdgeFlag edge, const uint8_t triggering_pin_number) {
-        if (cm->cycle_type != CYCLE_HOMING) { return GPIO_NOT_HANDLED; }
-        if (triggering_pin_number != hm.homing_input) { return GPIO_NOT_HANDLED; }
-        if (edge != INPUT_EDGE_LEADING) { return GPIO_NOT_HANDLED; }
-
-        en_take_encoder_snapshot();
-        cm_request_feedhold(FEEDHOLD_TYPE_SKIP, FEEDHOLD_EXIT_RESET_POSITION);
-
-        return GPIO_HANDLED; // DO NOT allow others to see this notice (particularly limits)
-    },
-    100,    // priority
-    nullptr // next - nullptr to start with
-};
 
 
 /***********************************************************************************
@@ -182,10 +153,8 @@ stat_t cm_homing_cycle_start(const float axes[], const bool flags[]) {
     hm.saved_feed_rate_mode = (cmFeedRateMode)cm_get_feed_rate_mode(ACTIVE_MODEL);
     hm.saved_feed_rate      = cm_get_feed_rate(ACTIVE_MODEL);
 
+//    copy_vector(hm.axes, axes);
     copy_vector(hm.axis_flags, flags);
-
-    // stop the spindle
-    spindle_stop();
 
     // set working values
     cm_set_units_mode(MILLIMETERS);
@@ -193,7 +162,6 @@ stat_t cm_homing_cycle_start(const float axes[], const bool flags[]) {
     cm_set_coord_system(ABSOLUTE_COORDS);  // homing is done in machine coordinates
     cm_set_feed_rate_mode(UNITS_PER_MINUTE_MODE);
     hm.set_coordinates = true;
-    hm.waiting_for_motion_end = false;
 
     // clear rotation matrix
     canonical_machine_reset_rotation(cm);
@@ -221,50 +189,22 @@ stat_t cm_homing_cycle_callback(void) {
         return (STAT_NOOP);
     }
     if (hm.waiting_for_motion_end) {        // sync to planner move ends (using callback)
-        // check for alarm or shutdown and recover
-        // expect the alarm or shutdown to flush the queue, so don't worry about that
-        if (cm->machine_state == MACHINE_ALARM || cm->machine_state == MACHINE_SHUTDOWN) {
-            cm_abort_homing(cm);
-            return (STAT_OK);
-        }
         return (STAT_EAGAIN);
     }
     return (hm.func(hm.axis));              // execute the current homing move
 }
 
 /***********************************************************************************
- * cm_abort_homing() - something big happened, the queue is flushing, reset to non-homing state
- *
- *  Note: No need to worry about resetting states we saved (if we are actually homig), since
- *  when this is called everything is being reset anyway.
- *
- *  The task here is to stop sending homing moves to the planner, and ensure we can re-enter
- *  homing fresh without issue.
- *
- */
-
-void cm_abort_homing(cmMachine_t *_cm) {
-    // The queue has been emptied, the callback is lost, and all of the states we saved are reset
-    hm.waiting_for_motion_end = false;
-
-    // The cycle_type may have already been changed, but if it hasn't do so now
-    if (_cm->cycle_type == CYCLE_HOMING) {
-        _cm->cycle_type = CYCLE_NONE;
-        _cm->machine_state = MACHINE_PROGRAM_STOP;
-
-        // the distance mode (incremental/absolute) is not normally reset, so reset it
-        cm_set_distance_mode(hm.saved_distance_mode);
-    }
-
-    // This is idempotent - if it's not there, no worries
-    din_handlers[INPUT_ACTION_INTERNAL].deregisterHandler(&_homing_handler);  // end homing mode
-
-    hm.func = nullptr;
-}
-
-/***********************************************************************************
  * Homing axis moves and helpers - these execute in sequence for each axis
  ***********************************************************************************/
+
+/*
+ * _set_homing_func() - a convenience for setting the next dispatch vector and exiting
+ */
+static stat_t _set_homing_func(stat_t (*func)(int8_t axis)) {
+    hm.func = func;
+    return (STAT_EAGAIN);
+}
 
 /***********************************************************************************
  * _homing_axis_start() - get next axis, initialize variables, call the clear
@@ -310,29 +250,28 @@ static stat_t _homing_axis_start(int8_t axis) {
     // Nothing to do about direction now that direction is explicit
     // However, here's a good place to stash the homing_switch:
     hm.homing_input = cm->a[axis].homing_input;
-    din_handlers[INPUT_ACTION_INTERNAL].registerHandler(&_homing_handler);
-
+    gpio_set_homing_mode(hm.homing_input, true);
     hm.axis            = axis;                                  // persist the axis
-    hm.search_velocity = std::abs(cm->a[axis].search_velocity);     // search velocity is always positive
-    hm.latch_velocity  = std::abs(cm->a[axis].latch_velocity);      // latch velocity is always positive
+    hm.search_velocity = fabs(cm->a[axis].search_velocity);     // search velocity is always positive
+    hm.latch_velocity  = fabs(cm->a[axis].latch_velocity);      // latch velocity is always positive
 
     bool homing_to_max = cm->a[axis].homing_dir;
 
     // setup parameters for positive or negative travel (homing to the max or min switch)
     if (homing_to_max) {
         hm.search_travel = travel_distance;                     // search travels in positive direction
-        hm.latch_backoff = std::abs(cm->a[axis].latch_backoff);     // latch travels in positive direction
+        hm.latch_backoff = fabs(cm->a[axis].latch_backoff);     // latch travels in positive direction
         hm.zero_backoff  = -max(0.0f, cm->a[axis].zero_backoff);// zero backoff is negative direction (or zero)
                                                                 // will set the maximum position
                                                                 //     (plus any negative backoff)
-        hm.setpoint = cm->a[axis].travel_max + (std::max(0.0f, -cm->a[axis].zero_backoff));
+        hm.setpoint = cm->a[axis].travel_max + (max(0.0f, -cm->a[axis].zero_backoff));
     } else {
         hm.search_travel = -travel_distance;                    // search travels in negative direction
-        hm.latch_backoff = -std::abs(cm->a[axis].latch_backoff);    // latch travels in negative direction
-        hm.zero_backoff  = std::max(0.0f, cm->a[axis].zero_backoff); // zero backoff is positive direction (or zero)
+        hm.latch_backoff = -fabs(cm->a[axis].latch_backoff);    // latch travels in negative direction
+        hm.zero_backoff  = max(0.0f, cm->a[axis].zero_backoff); // zero backoff is positive direction (or zero)
                                                                 // will set the minimum position
                                                                 //     (minus any negative backoff)
-        hm.setpoint = cm->a[axis].travel_min + (std::max(0.0f, -cm->a[axis].zero_backoff));
+        hm.setpoint = cm->a[axis].travel_min + (max(0.0f, -cm->a[axis].zero_backoff));
     }
 
     // if homing is disabled for the axis then skip to the next axis
@@ -393,7 +332,7 @@ static stat_t _homing_axis_latch(int8_t axis)  // drive to switch at low speed
 /***********************************************************************************
  * _homing_axis_setpoint_backoff() - backoff to zero or max setpoint position
  */
-static stat_t _homing_axis_setpoint_backoff(int8_t axis)  //
+static stat_t _homing_axis_setpoint_backoff(int8_t axis)  // 
 {
     _homing_axis_move(axis, hm.zero_backoff, hm.search_velocity);
     return (_set_homing_func(_homing_axis_set_position));
@@ -415,13 +354,18 @@ static stat_t _homing_axis_set_position(int8_t axis)
     }
     cm_set_axis_max_jerk(axis, hm.saved_jerk);  // restore the max jerk value
 
-    din_handlers[INPUT_ACTION_INTERNAL].deregisterHandler(&_homing_handler);  // end homing mode
+    gpio_set_homing_mode(hm.homing_input, false);  // end homing mode
     return (_set_homing_func(_homing_axis_start));
 }
 
 /***********************************************************************************
  * _homing_axis_move()       - helper that actually executes the above moves
+ * _motion_end_callback()    - callback completes when motion has stopped
  */
+static void _motion_end_callback(float* vect, bool* flag) 
+{
+    hm.waiting_for_motion_end = false; 
+}
 
 static stat_t _homing_axis_move(int8_t axis, float target, float velocity) {
     float vect[]  = INIT_AXES_ZEROES;
@@ -440,13 +384,9 @@ static stat_t _homing_axis_move(int8_t axis, float target, float velocity) {
     }
 
     // the last two arguments are ignored anyway
-    mp_queue_command(_homing_axis_move_callback, nullptr, nullptr);
-
+    mp_queue_command(_motion_end_callback, nullptr, nullptr);
     return (STAT_EAGAIN);
 }
-
-static void _homing_axis_move_callback(float* vect, bool* flag) { hm.waiting_for_motion_end = false; }
-
 
 /***********************************************************************************
  * _homing_error_exit()
@@ -476,11 +416,11 @@ static stat_t _homing_error_exit(int8_t axis, stat_t status) {
 
 static stat_t _homing_finalize_exit(int8_t axis)  // third part of return to home
 {
-    cm_set_feed_rate(hm.saved_feed_rate);
     cm_set_coord_system(hm.saved_coord_system);  // restore to work coordinate system
     cm_set_units_mode(hm.saved_units_mode);
     cm_set_distance_mode(hm.saved_distance_mode);
     cm_set_feed_rate_mode(hm.saved_feed_rate_mode);
+    cm_set_feed_rate(hm.saved_feed_rate);
     cm_set_motion_mode(MODEL, MOTION_MODE_CANCEL_MOTION_MODE);
     cm_canned_cycle_end();
     return (STAT_OK);

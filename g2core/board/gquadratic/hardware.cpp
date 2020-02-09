@@ -1,10 +1,9 @@
 /*
  * hardware.cpp - general hardware support functions
- * For: /board/g2v9
+ * For: /board/gQuadratic
  * This file is part of the g2core project
  *
  * Copyright (c) 2010 - 2018 Alden S. Hart, Jr.
- * Copyright (c) 2013 - 2018 Robert Giseburt
  *
  * This file ("the software") is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2 as published by the
@@ -37,60 +36,38 @@
 #include "MotateUtilities.h"
 #include "MotateUniqueID.h"
 #include "MotatePower.h"
-#include "board_spi.h"
-#include "sd_persistence.h"
 
-#include "board_gpio.h"
+//Motate::ClockOutputPin<Motate::kExternalClock1_PinNumber> external_clk_pin {16000000}; // 16MHz optimally
+//Motate::OutputPin<Motate::kExternalClock1_PinNumber> external_clk_pin {Motate::kStartLow};
 
-#ifndef SPINDLE_ENABLE_OUTPUT_NUMBER
-#warning SPINDLE_ENABLE_OUTPUT_NUMBER is defaulted to 4!
-#warning SPINDLE_ENABLE_OUTPUT_NUMBER should be defined in settings or a board file!
-#define SPINDLE_ENABLE_OUTPUT_NUMBER 4
-#endif
+#include "neopixel.h"
+#include "canonical_machine.h"
 
-#ifndef SPINDLE_DIRECTION_OUTPUT_NUMBER
-#warning SPINDLE_DIRECTION_OUTPUT_NUMBER is defaulted to 5!
-#warning SPINDLE_DIRECTION_OUTPUT_NUMBER should be defined in settings or a board file!
-#define SPINDLE_DIRECTION_OUTPUT_NUMBER 5
-#endif
+namespace LEDs {
+    NeoPixel<Motate::kLED_RGBWPixelPinNumber, 15> rgbw_leds {NeoPixelOrder::GRB};
 
-#ifndef SPINDLE_PWM_NUMBER
-#warning SPINDLE_PWM_NUMBER is defaulted to 6!
-#warning SPINDLE_PWM_NUMBER should be defined in settings or a board file!
-#define SPINDLE_PWM_NUMBER 6
-#endif
+    RGB_Color_t display_color[15] {
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+        {0, 0, 0, 5},
+    };
 
-SPIBus_used_t spiBus;
-
-Motate::SPIChipSelectPin<Motate::kSD_ChipSelectPinNumber> sdcs{};
-SDCard_used_t sd_card{spiBus, sdcs};
-
-#ifdef BANTAM
-
-#include "bantam_safety_manager.h"
-
-BantamSafetyManager sm{};
-SafetyManager *safety_manager = &sm;
-
-#else
-
-#include "safety_manager.h"
-
-SafetyManager sm{};
-SafetyManager *safety_manager = &sm;
-
-// Stub in getSysConfig_3
-// constexpr cfgItem_t sys_config_items_3[] = {};
-constexpr cfgSubtableFromStaticArray sys_config_3{};
-const configSubtable * const getSysConfig_3() { return &sys_config_3; }
-
-#endif
-
-#include "esc_spindle.h"
-ESCSpindle esc_spindle {SPINDLE_PWM_NUMBER, SPINDLE_ENABLE_OUTPUT_NUMBER, SPINDLE_DIRECTION_OUTPUT_NUMBER, SPINDLE_SPEED_CHANGE_PER_MS};
-
-ToolHead *toolhead_for_tool(uint8_t tool) {
-    return &esc_spindle;
+    bool alarm_red = false; // if we are in alarm, the tells us if we're going to red (pulsing)
+    bool shutdown_white = false; // if we are in shutdown, the tells us if we're going to red (pulsing)
+    cmMachineState last_see_machine_state;
+    float old_x_pos = 0.0;
 }
 
 /*
@@ -99,13 +76,14 @@ ToolHead *toolhead_for_tool(uint8_t tool) {
 
 void hardware_init()
 {
-    spiBus.init();
-    sd_card.init();
-    setup_sd_persistence();
     board_hardware_init();
-    toolhead_for_tool(0)->init();
-    spindle_set_toolhead(toolhead_for_tool(0));
-    return;
+//    external_clk_pin = 0; // Force external clock to 0 for now.
+
+    for (uint8_t pixel = 0; pixel < LEDs::rgbw_leds.count; pixel++) {
+        LEDs::display_color[pixel].startTransition(100, 0, 0, 0);
+        LEDs::rgbw_leds.setPixel(pixel, LEDs::display_color[pixel]);
+    }
+    LEDs::rgbw_leds.update();
 }
 
 /*
@@ -114,7 +92,36 @@ void hardware_init()
 
 stat_t hardware_periodic()
 {
-    sd_card.periodicCheck();
+    float x_pos = cm_get_display_position(ACTIVE_MODEL, AXIS_X);
+    if (fabs(LEDs::old_x_pos - x_pos) > 0.01) {
+        LEDs::old_x_pos = x_pos;
+
+        float led_pos = x_pos * ((float)(LEDs::rgbw_leds.count-1) / 40);
+
+        for (uint8_t pixel = 0; pixel < LEDs::rgbw_leds.count; pixel++) {
+            float value = fabs(led_pos - (float)pixel);
+            if (value < 1.001) {
+                value = 1.0 - value;
+                if (LEDs::display_color[pixel].red < value) {
+                    LEDs::display_color[pixel].startTransition(10, value, value, value);
+                } else {
+                    LEDs::display_color[pixel].startTransition(500, 0, 0, 0);
+                }
+            } else {
+//                LEDs::display_color[pixel].startTransition(500, 0, 0, 0);
+            }
+//            LEDs::display_color[pixel].startTransition(100, std::max(0.0f, std::min(40.0f, (float)(x_pos/40.0) )), 0, 0);
+        }
+    }
+
+    for (uint8_t pixel = 0; pixel < LEDs::rgbw_leds.count; pixel++) {
+        if (LEDs::display_color[pixel].update()) {
+            LEDs::rgbw_leds.setPixel(pixel, LEDs::display_color[pixel]);
+        }
+    }
+
+    LEDs::rgbw_leds.update();
+
     return STAT_OK;
 }
 
@@ -125,12 +132,12 @@ stat_t hardware_periodic()
 
 void hw_hard_reset(void)
 {
-    Motate::System::reset(/*bootloader: */ false); // arg=0 resets the system
+    Motate::System::reset(/*boootloader: */ false); // arg=0 resets the system
 }
 
 void hw_flash_loader(void)
 {
-    Motate::System::reset(/*bootloader: */ true);  // arg=1 erases FLASH and enters FLASH loader
+    Motate::System::reset(/*boootloader: */ true);  // arg=1 erases FLASH and enters FLASH loader
 }
 
 /*
@@ -145,7 +152,7 @@ void _get_id(char *id)
     char *p = id;
     const char *uuid = Motate::UUID;
 
-    Motate::strncpy(p, uuid, Motate::strlen(uuid)+1);
+    Motate::strncpy(p, uuid, Motate::strlen(uuid));
 }
 
 /***** END OF SYSTEM FUNCTIONS *****/
@@ -195,23 +202,21 @@ stat_t hw_get_fbc(nvObj_t *nv)
 
 stat_t hw_get_id(nvObj_t *nv)
 {
-	char tmp[SYS_ID_LEN];
-	_get_id(tmp);
-	nv->valuetype = TYPE_STRING;
-	ritorno(nv_copy_string(nv, tmp));
-	return (STAT_OK);
+    char tmp[SYS_ID_LEN];
+    _get_id(tmp);
+    nv->valuetype = TYPE_STRING;
+    ritorno(nv_copy_string(nv, tmp));
+    return (STAT_OK);
 }
 
 /*
  * hw_flash() - invoke FLASH loader from command input
  */
-
 stat_t hw_flash(nvObj_t *nv)
 {
     hw_flash_loader();
-	return(STAT_OK);
+    return(STAT_OK);
 }
-
 
 /***********************************************************************************
  * TEXT MODE SUPPORT
@@ -237,3 +242,4 @@ stat_t hw_flash(nvObj_t *nv)
     void hw_print_id(nvObj_t *nv)  { text_print(nv, fmt_id);}   // TYPE_STRING
 
 #endif //__TEXT_MODE
+

@@ -28,8 +28,6 @@
 #ifndef COOLANT_H_ONCE
 #define COOLANT_H_ONCE
 
-#include "gpio.h"
-
 typedef enum {
     COOLANT_OFF = 0,        // don't change the order. 0/1 get masked.
     COOLANT_ON = 1,
@@ -43,8 +41,8 @@ typedef enum {
 // These will all need to be changed to ACTIVE_HIGH = 0, ACTIVE_LOW = 1
 // See: https://github.com/synthetos/g2_private/wiki/GPIO-Design-Discussion#settings-common-to-all-io-types
 
-typedef enum {
-    COOLANT_ACTIVE_LOW = 0,
+typedef enum { 
+    COOLANT_ACTIVE_LOW = 0, 
     COOLANT_ACTIVE_HIGH = 1
 } coPolarity;
 
@@ -60,10 +58,9 @@ typedef enum {              // don't change the order. used as a bitmask
  */
 
 typedef struct coCoolantChannel {
-    bool              pause_enable; // {coph:} pause on feedhold
-    coControl         state;        // coolant state: coControl
-    coPolarity        polarity;     // 0=active low, 1=active high
-    gpioDigitalOutput *output;      // gpio output pointer (may be NULL)
+    bool        pause_enable;       // {coph:} pause on feedhold
+    coControl   state;              // coolant state: coControl
+    coPolarity  polarity;           // 0=active low, 1=active high
 } coCoolantChannel_t;
 
 typedef struct coCoolant {
@@ -81,7 +78,6 @@ void coolant_reset();
 
 stat_t coolant_control_immediate(coControl control, coSelect select);
 stat_t coolant_control_sync(coControl control, coSelect select);
-bool coolant_ready();
 
 stat_t co_get_coph(nvObj_t *nv);
 stat_t co_set_coph(nvObj_t *nv);

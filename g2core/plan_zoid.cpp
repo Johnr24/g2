@@ -2,8 +2,8 @@
  * plan_zoid.cpp - acceleration managed line planning and motion execution - trapezoid planner
  * This file is part of the g2core project
  *
- * Copyright (c) 2010 - 2019 Alden S. Hart, Jr.
- * Copyright (c) 2012 - 2019 Rob Giseburt
+ * Copyright (c) 2010 - 2018 Alden S. Hart, Jr.
+ * Copyright (c) 2012 - 2018 Rob Giseburt
  *
  * This file ("the software") is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2 as published by the
@@ -70,7 +70,7 @@ static float _get_meet_velocity(const float          v_0,
                                 const float          v_2,
                                 const float          L,
                                 mpBuf_t*             bf,
-                                mpBlockRuntimeBuf_t* block) HOT_FUNC;
+                                mpBlockRuntimeBuf_t* block);
 
 /****************************************************************************************
  * mp_calculate_ramps() - calculate trapezoid-like ramp parameters for a block
@@ -354,7 +354,7 @@ stat_t mp_calculate_ramps(mpBlockRuntimeBuf_t* block, mpBuf_t* bf, const float e
 float mp_get_target_length(const float v_0, const float v_1, const mpBuf_t* bf) 
 {
     const float q_recip_2_sqrt_j = bf->q_recip_2_sqrt_j;
-    return q_recip_2_sqrt_j * sqrt(std::abs(v_1 - v_0)) * (v_1 + v_0);
+    return q_recip_2_sqrt_j * sqrt(fabs(v_1 - v_0)) * (v_1 + v_0);
 }
 
 /*
@@ -396,7 +396,7 @@ float mp_get_target_velocity(const float v_0, const float L, const mpBuf_t* bf)
     //          v_1 =    1/3 ((const1a v_0^2)/b  +  b const2a  -  v_0)
     const float v_1 = const3 * ((const1a * v_0_2) / b + b * const2a - v_0);
 
-    return std::abs(v_1);
+    return fabs(v_1);
 }
 
 /*
@@ -434,7 +434,7 @@ float mp_get_decel_velocity(const float v_0, const float L, const mpBuf_t* bf)
         // The return condition allows a minor error in length (in mm). 
         // Note: This comparison does NOT affect actual lengths or steps, which would be bad.
         //       The actual lengths traveled must be controlled by the caller.
-        if (std::abs(l_t) < 0.001) {
+        if (fabs(l_t) < 0.001) {
             break;
         }
         // For the first pass we tested velocity 0. If velocity 0 yields a l_t > 0, 
@@ -536,8 +536,8 @@ static float _get_meet_velocity(const float          v_0,
         }
 
         // Precompute some common chunks -- note that some attempts may have v_1 < v_0 or v_1 < v_2
-        const float sqrt_delta_v_0 = sqrt(std::abs(v_1 - v_0));
-        const float sqrt_delta_v_2 = sqrt(std::abs(v_1 - v_2));  // 849us
+        const float sqrt_delta_v_0 = sqrt(fabs(v_1 - v_0));
+        const float sqrt_delta_v_2 = sqrt(fabs(v_1 - v_2));  // 849us
 
         // l_c is our total-length calculation with the current v_1 estimate, minus the expected length.
         // This makes l_c == 0 when v_1 is the correct value.
