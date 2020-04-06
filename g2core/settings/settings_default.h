@@ -233,7 +233,7 @@
 #define M1_TRAVEL_PER_REV           40                    // {1tr:  1.25 is a typical value for a screw axis
 #endif
 #ifndef M1_MICROSTEPS
-#define M1_MICROSTEPS               16                       // {1mi:  1,2,4,8,    16,32 (G2 ONLY)
+#define M1_MICROSTEPS               8                       // {1mi:  1,2,4,8,    16,32 (G2 ONLY)
 #endif
 #ifndef M1_STEPS_PER_UNIT
 #define M1_STEPS_PER_UNIT           0                       // {1su:  steps to issue per unit of length or degrees of rotation
@@ -297,7 +297,7 @@
 #define M3_TRAVEL_PER_REV           8                    // 1.25 is a typical value for a screw axis
 #endif
 #ifndef M3_MICROSTEPS
-#define M3_MICROSTEPS               16
+#define M3_MICROSTEPS               4
 #endif
 #ifndef M3_STEPS_PER_UNIT
 #define M3_STEPS_PER_UNIT           0
@@ -423,7 +423,7 @@
 #define X_AXIS_MODE                 AXIS_STANDARD           // {xam:  see canonical_machine.h cmAxisMode for valid values
 #endif
 #ifndef X_VELOCITY_MAX
-#define X_VELOCITY_MAX              16000.0                  // {xvm:  G0 max velocity in mm/min
+#define X_VELOCITY_MAX              8000.0                  // {xvm:  G0 max velocity in mm/min
 #endif
 #ifndef X_FEEDRATE_MAX
 #define X_FEEDRATE_MAX              8000.0                  // {xfr:  G1 max feed rate in mm/min
@@ -435,7 +435,7 @@
 #define X_TRAVEL_MAX                530                    // {xtm:  travel between switches or crashes
 #endif
 #ifndef X_JERK_MAX
-#define X_JERK_MAX                  6500.0                  // {xjm:
+#define X_JERK_MAX                  5000.0                  // {xjm:
 #endif
 #ifndef X_JERK_HIGH_SPEED
 #define X_JERK_HIGH_SPEED           20000.0                  // {xjh:
@@ -447,7 +447,7 @@
 #define X_HOMING_DIRECTION          0                       // {xhd:  0=search moves negative, 1= search moves positive
 #endif
 #ifndef X_SEARCH_VELOCITY
-#define X_SEARCH_VELOCITY          10000.0                   // {xsv:  minus means move to minimum switch
+#define X_SEARCH_VELOCITY          3000.0                   // {xsv:  minus means move to minimum switch
 #endif
 #ifndef X_LATCH_VELOCITY
 #define X_LATCH_VELOCITY            100.0                   // {xlv:  mm/min
@@ -476,7 +476,7 @@
 #define Y_TRAVEL_MAX                319.0
 #endif
 #ifndef Y_JERK_MAX
-#define Y_JERK_MAX                  6500.0
+#define Y_JERK_MAX                  5000.0
 #endif
 #ifndef Y_JERK_HIGH_SPEED
 #define Y_JERK_HIGH_SPEED           20000.0
@@ -505,10 +505,10 @@
 #define Z_AXIS_MODE                 AXIS_STANDARD
 #endif
 #ifndef Z_VELOCITY_MAX
-#define Z_VELOCITY_MAX              7000.0
+#define Z_VELOCITY_MAX              4000.0
 #endif
 #ifndef Z_FEEDRATE_MAX
-#define Z_FEEDRATE_MAX              7000.0
+#define Z_FEEDRATE_MAX              4000.0
 #endif
 #ifndef Z_TRAVEL_MAX
 #define Z_TRAVEL_MAX                0
@@ -517,10 +517,10 @@
 #define Z_TRAVEL_MIN                -180
 #endif
 #ifndef Z_JERK_MAX
-#define Z_JERK_MAX                  700.0
+#define Z_JERK_MAX                  10000.0
 #endif
 #ifndef Z_JERK_HIGH_SPEED
-#define Z_JERK_HIGH_SPEED           700.0
+#define Z_JERK_HIGH_SPEED           20000.0
 #endif
 #ifndef Z_HOMING_INPUT
 #define Z_HOMING_INPUT              6
