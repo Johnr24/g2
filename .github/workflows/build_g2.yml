@@ -29,18 +29,13 @@ jobs:
       run: |
         mkdir -p ./bin/ARTIFACTS/
 
-    - name: make CONFIG=Othermill
+    - name: make PLATFORM=Due BOARD=gShield
       working-directory: ${{ github.workspace }}/g2core/
       run: |
-        make CONFIG=Othermill VERBOSE=2 COLOR=0
-        cp ./bin/Othermill-g2v9k/g2core-summed.bin ./bin/ARTIFACTS/g2core-Othermill-g2v9k-`git describe --abbrev=4 --dirty --always --tags`.bin
+        make platform=DUE BOARD=gShield VERBOSE=2 COLOR=0
+        cp ./bin/gShield/g2core-summed.bin ./bin/ARTIFACTS/g2core-Othermill-g2v9k-`git describe --abbrev=4 --dirty --always --tags`.bin
 
-    - name: make CONFIG=OthermillPro
-      working-directory: ${{ github.workspace }}/g2core/
-      run: |
-        make CONFIG=OthermillPro VERBOSE=2 COLOR=0
-        cp ./bin/OthermillPro-g2v9k/g2core-summed.bin ./bin/ARTIFACTS/g2core-OthermillPro-g2v9k-`git describe --abbrev=4 --dirty --always --tags`.bin
-
+   
     - name: Archive binaries
       uses: actions/upload-artifact@v1
       with:

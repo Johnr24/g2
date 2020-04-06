@@ -195,14 +195,14 @@ pin_number kSocket6_VrefPinNumber           = -1;  // 67; //PWMTimer<0>
 
 
 pin_number kInput1_PinNumber = 14;
-pin_number kInput2_PinNumber = 16;
+pin_number kInput2_PinNumber = -1;
 pin_number kInput3_PinNumber = 15;
-pin_number kInput4_PinNumber = 17;
+pin_number kInput4_PinNumber = -1;
 pin_number kInput5_PinNumber = 58;
 pin_number kInput6_PinNumber = 59;
 
-pin_number kInput7_PinNumber  = 18;
-pin_number kInput8_PinNumber  = 19;
+pin_number kInput7_PinNumber  = -1;
+pin_number kInput8_PinNumber  = -1;
 pin_number kInput9_PinNumber  = 60;
 pin_number kInput10_PinNumber = 61;
 pin_number kInput11_PinNumber = 65;
