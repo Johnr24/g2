@@ -26,19 +26,28 @@
  */
 #include "g2core.h"
 #include "persistence.h"
+#include "canonical_machine.h"
+#include "report.h"
+//#include "util.h"
+
+/***********************************************************************************
+ **** STRUCTURE ALLOCATIONS ********************************************************
+ ***********************************************************************************/
+
+nvmSingleton_t nvm;
 
 /***********************************************************************************
  **** GENERIC STATIC FUNCTIONS AND VARIABLES ***************************************
  ***********************************************************************************/
 
-Persistence *persistence = nullptr;
+
+/***********************************************************************************
+ **** CODE *************************************************************************
+ ***********************************************************************************/
 
 void persistence_init()
 {
-    if (persistence == nullptr) {
-        return;
-    }
-    persistence->init();
+    return;
 }
 
 /*
@@ -49,11 +58,8 @@ void persistence_init()
 
 stat_t read_persistent_value(nvObj_t *nv)
 {
-    if (persistence == nullptr) {
-        return (STAT_OK);  // it worked! ;-)
-    }
-
-    return persistence->read(nv);
+    nv->value_flt = 0;
+    return (STAT_OK);
 }
 
 /*
@@ -65,23 +71,8 @@ stat_t read_persistent_value(nvObj_t *nv)
 
 stat_t write_persistent_value(nvObj_t *nv)
 {
-    if (persistence == nullptr) {
-        return (STAT_OK);  // it worked! ;-)
-    }
-
-    return persistence->write(nv);
-}
-
-/*
- * write_persistent_values_callback()
- */
-
-stat_t write_persistent_values_callback()
-{
-    if (persistence == nullptr) {
-        return (STAT_OK);  // it worked! ;-)
-    }
-
-    return persistence->periodic();
-
+//    if (cm->cycle_state != CYCLE_OFF) { // can't write when machine is moving
+//        return(rpt_exception(STAT_FILE_NOT_OPEN, "write_persistent_value() can't write when machine is in cycle"));
+//    }
+    return (STAT_OK);
 }

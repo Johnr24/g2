@@ -55,6 +55,11 @@
 #define INPUT12_AVAILABLE 1
 #define INPUT13_AVAILABLE 0
 
+#define ADC0_AVAILABLE 0
+#define ADC1_AVAILABLE 0
+#define ADC2_AVAILABLE 0
+#define ADC3_AVAILABLE 0
+
 #define XIO_HAS_USB 1
 #define XIO_HAS_UART 0
 #define XIO_HAS_SPI 0
@@ -190,18 +195,6 @@ pin_number kSocket6_VrefPinNumber           = -1;  // 67; //PWMTimer<0>
 
 
 pin_number kInput1_PinNumber = 14;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-pin_number kInput2_PinNumber = -1;
-pin_number kInput3_PinNumber = 15;
-pin_number kInput4_PinNumber = -1;
-pin_number kInput5_PinNumber = 58;
-pin_number kInput6_PinNumber = 59;
-
-pin_number kInput7_PinNumber  = -1;
-pin_number kInput8_PinNumber  = -1;
-=======
 pin_number kInput2_PinNumber = 15;
 pin_number kInput3_PinNumber = 16;
 pin_number kInput4_PinNumber = 17;
@@ -210,27 +203,6 @@ pin_number kInput6_PinNumber = 19;
 
 pin_number kInput7_PinNumber  = 58;
 pin_number kInput8_PinNumber  = 59;
->>>>>>> parent of a02a4fb5... Pinout Tweak
-=======
-pin_number kInput2_PinNumber = 15;
-pin_number kInput3_PinNumber = 16;
-pin_number kInput4_PinNumber = 17;
-pin_number kInput5_PinNumber = 18;
-pin_number kInput6_PinNumber = 19;
-
-pin_number kInput7_PinNumber  = 58;
-pin_number kInput8_PinNumber  = 59;
->>>>>>> parent of a02a4fb5... Pinout Tweak
-=======
-pin_number kInput2_PinNumber = 15;
-pin_number kInput3_PinNumber = 16;
-pin_number kInput4_PinNumber = 17;
-pin_number kInput5_PinNumber = 18;
-pin_number kInput6_PinNumber = 19;
-
-pin_number kInput7_PinNumber  = 58;
-pin_number kInput8_PinNumber  = 59;
->>>>>>> parent of a02a4fb5... Pinout Tweak
 pin_number kInput9_PinNumber  = 60;
 pin_number kInput10_PinNumber = 61;
 pin_number kInput11_PinNumber = 65;

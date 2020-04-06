@@ -43,7 +43,7 @@ const Motate::USBSettings_t Motate::USBSettings = {
 };
 /*gProductVersion   = */ //0.1,
 
-HOT_DATA XIOUSBDevice_t usb;
+XIOUSBDevice_t usb;
 
 decltype(usb.mixin<0>::Serial) &SerialUSB = usb.mixin<0>::Serial;
 #if USB_SERIAL_PORTS_EXPOSED == 2
@@ -58,13 +58,13 @@ MOTATE_SET_USB_SERIAL_NUMBER_STRING_FROM_CHIPID()
 
 //******** SPI ********
 #if XIO_HAS_SPI
-HOT_DATA Motate::SPI<kSocket4_SPISlaveSelectPinNumber> spi;
+Motate::SPI<kSocket4_SPISlaveSelectPinNumber> spi;
 #endif
 
 
 //******** UART ********
 #if XIO_HAS_UART
-HOT_DATA Motate::UART<Motate::kSerial_RXPinNumber, Motate::kSerial_TXPinNumber, Motate::kSerial_RTSPinNumber, Motate::kSerial_CTSPinNumber> Serial {115200, Motate::UARTMode::RTSCTSFlowControl};
+Motate::UART<Motate::kSerial_RXPinNumber, Motate::kSerial_TXPinNumber, Motate::kSerial_RTSPinNumber, Motate::kSerial_CTSPinNumber> Serial {115200, Motate::UARTMode::RTSCTSFlowControl};
 #endif
 
 void board_hardware_init(void) // called 1st
@@ -72,12 +72,11 @@ void board_hardware_init(void) // called 1st
 #if XIO_HAS_USB
     // Init USB
     usb.attach();
-    usb.handleVbusChange(true);
 #endif // XIO_HAS_USB
 }
 
 
-void board_xio_init(void) // called later than board_hardware_init (there are things in between)
+void board_xio_init(void) // called later than board_hardware_init (there are thing in between)
 {
     // Init SPI
 #if XIO_HAS_SPI

@@ -2,7 +2,7 @@
  * report.cpp - Status reports and other reporting functions
  * This file is part of the g2core project
  *
- * Copyright (c) 2010 - 2019 Alden S. Hart, Jr.
+ * Copyright (c) 2010 - 2018 Alden S. Hart, Jr.
  *
  * This file ("the software") is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2 as published by the
@@ -194,38 +194,17 @@ void sr_init_status_report()
     // record the index of the "stat" variable so we can use it during reporting
     sr.stat_index = nv_get_index((const char *)"", (const char *)"stat");
 
-    // setup the status report array
+    // setup the status report array 
     for (uint8_t i=0; i < NV_STATUS_REPORT_LEN ; i++) {
         if (sr_defaults[i][0] == NUL) break;                    // quit on first blank array entry
-        sr.status_report_list[i].value = -1234567;                   // pre-load values with an unlikely number
-
+        sr.status_report_value[i] = -1234567;                   // pre-load values with an unlikely number
         nv->value_int = nv_get_index((const char *)"", sr_defaults[i]);// load the index for the SR element
         if (nv->value_int == NO_MATCH) {
             rpt_exception(STAT_BAD_STATUS_REPORT_SETTING, "sr_init_status_report() encountered bad SR setting"); // trap mis-configured profile settings
             return;
         }
-
-        auto &cfgTmp = cfgArray[nv->value_int];
-        sr.status_report_list[i].index = nv->value_int;
-        sr.status_report_list[i].get = cfgTmp.get;
-        // sr.status_report_list[i].flags = cfgTmp.flags;
-        sr.status_report_list[i].precision = cfgTmp.precision;
-        strcpy(sr.status_report_list[i].group, cfgTmp.group);
-        strcpy(sr.status_report_list[i].token, cfgTmp.token);
-
-        // special processing for system groups and stripping tokens for groups
-        if (cfgTmp.group[0] != NUL) {
-            if (cfgArray[nv->index].flags & F_NOSTRIP) {
-                sr.status_report_list[i].group[0] = NUL;
-                strcpy(sr.status_report_list[i].token, cfgTmp.token);
-            } else {
-                strcpy(sr.status_report_list[i].group, cfgTmp.group);
-                strcpy(sr.status_report_list[i].token, &cfgTmp.token[strlen(cfgTmp.group)]); // strip group from the token
-            }
-        }
-
         nv_set(nv);
-        // nv_persist(nv);                                         // conditionally persist - automatic by nv_persist()
+        nv_persist(nv);                                         // conditionally persist - automatic by nv_persist()
         nv->index++;                                            // increment SR NVM index
     }
 }
@@ -241,7 +220,7 @@ void sr_init_status_report()
 stat_t sr_set_status_report(nvObj_t *nv)
 {
     uint8_t elements = 0;
-    status_report_item status_report_list[NV_STATUS_REPORT_LEN];
+    index_t status_report_list[NV_STATUS_REPORT_LEN];
     memset(status_report_list, 0, sizeof(status_report_list));
     index_t sr_start = nv_get_index((const char *)"",(const char *)"se00");// set first SR persistence index
 
@@ -251,25 +230,7 @@ stat_t sr_set_status_report(nvObj_t *nv)
         }
         // Note: valuetype may have been coerced from boolean to something else, so just treat value_int as a bool
         if (nv->value_int) {
-            auto &cfgTmp = cfgArray[nv->value_int];
-
-            sr.status_report_list[i].index = nv->index;
-            sr.status_report_list[i].get = cfgTmp.get;
-            // sr.status_report_list[i].flags = cfgTmp.flags;
-            sr.status_report_list[i].precision = cfgTmp.precision;
-            strcpy(sr.status_report_list[i].group, cfgTmp.group);
-            strcpy(sr.status_report_list[i].token, cfgTmp.token);
-
-            // special processing for system groups and stripping tokens for groups
-            if (cfgTmp.group[0] != NUL) {
-                if (cfgArray[nv->index].flags & F_NOSTRIP) {
-                    sr.status_report_list[i].group[0] = NUL;
-                    strcpy(sr.status_report_list[i].token, cfgTmp.token);
-                } else {
-                    strcpy(sr.status_report_list[i].group, cfgTmp.group);
-                    strcpy(sr.status_report_list[i].token, &cfgTmp.token[strlen(cfgTmp.group)]); // strip group from the token
-                }
-            }
+            status_report_list[i] = nv->index;
             nv->value_int = nv->index;                      // persist the index as the value
             nv->index = sr_start + i;                       // index of the SR persistence location
             nv_persist(nv);
@@ -306,7 +267,7 @@ stat_t sr_request_status_report(cmStatusReportRequest request_type)
         return (STAT_OK);
    }
 
-    sr.status_report_systick.set(1);
+    sr.status_report_systick = SysTickTimer_getValue();
     if (request_type == SR_REQUEST_IMMEDIATE) {
         sr.status_report_request = SR_FILTERED;     // will trigger a filtered or verbose report depending on verbosity setting
 
@@ -315,11 +276,11 @@ stat_t sr_request_status_report(cmStatusReportRequest request_type)
 
     } else if (request_type == SR_REQUEST_TIMED) {
         sr.status_report_request = sr.status_report_verbosity;
-        sr.status_report_systick.set(sr.status_report_interval);
+        sr.status_report_systick += sr.status_report_interval;
 
     } else {
         sr.status_report_request = SR_VERBOSE;
-        sr.status_report_systick.set(sr.status_report_interval);
+        sr.status_report_systick += sr.status_report_interval;
     }
     return (STAT_OK);
 }
@@ -332,8 +293,7 @@ stat_t sr_status_report_callback()         // called by controller dispatcher
     // conditions where autogenerated SRs will not be returned
     if ((sr.status_report_request == SR_OFF) ||
         (sr.status_report_verbosity == SR_OFF) ||
-        (!sr.status_report_systick.isPast()) ||
-        (cs.controller_state != CONTROLLER_READY) ) {
+        (SysTickTimer_getValue() < sr.status_report_systick) ) {
         return (STAT_NOOP);
     }
 
@@ -346,7 +306,6 @@ stat_t sr_status_report_callback()         // called by controller dispatcher
     }
 
     sr.status_report_request = SR_OFF;
-    sr.status_report_systick.clear();
     if ((sr.status_report_request == SR_VERBOSE) ||
         (sr.status_report_verbosity == SR_VERBOSE)) {
         _populate_unfiltered_status_report();
@@ -377,7 +336,7 @@ stat_t sr_run_text_status_report()
 static stat_t _populate_unfiltered_status_report()
 {
     const char sr_str[] = "sr";
-    // char tmp[TOKEN_LEN+1];
+    char tmp[TOKEN_LEN+1];
     nvObj_t *nv = nv_reset_nv_list();       // sets *nv to the start of the body
 
     nv->valuetype = TYPE_PARENT;            // setup the parent object (no length checking required)
@@ -386,19 +345,12 @@ static stat_t _populate_unfiltered_status_report()
     nv = nv->nx;                            // no need to check for NULL as list has just been reset
 
     for (uint8_t i=0; i<NV_STATUS_REPORT_LEN; i++) {
-        if (sr.status_report_list[i].index == 0) {  // end of list
-            break;
-        }
-        // nv_get_nvObj(nv);
-        nv_reset_nv(nv);
-        nv->index = sr.status_report_list[i].index;
-        strcpy(nv->group, sr.status_report_list[i].group);
-        strcpy(nv->token, sr.status_report_list[i].token);
+        if ((nv->index = sr.status_report_list[i]) == 0) { break;}
+        nv_get_nvObj(nv);
 
-        sr.status_report_list[i].get(nv);
-
-        strcpy(nv->token, sr.status_report_list[i].group);
-        strcpy(nv->token + strlen(sr.status_report_list[i].group), sr.status_report_list[i].token);
+        strcpy(tmp, nv->group);             // flatten out groups - WARNING - you cannot use strncpy here...
+        strcat(tmp, nv->token);
+        strcpy(nv->token, tmp);             //...or here.
 
         if ((nv = nv->nx) == NULL) {
             return (cm_panic(STAT_BUFFER_FULL_FATAL, "_populate_unfiltered_status_report() sr link NULL"));    // should never be NULL unless SR length exceeds available buffer array
@@ -424,11 +376,11 @@ static uint8_t _populate_filtered_status_report()
 {
     const char sr_str[] = "sr";
     bool has_data = false;
-    // char tmp[TOKEN_LEN+1];
+    char tmp[TOKEN_LEN+1];
     float current_value;
     nvObj_t *nv = nv_reset_nv_list();           // sets nv to the start of the body
-
-    // Set thresholds to detect value changes based on precision for the value.
+    
+    // Set thresholds to detect value changes based on precision for the value. 
     // Allow for floating point roundoffs, i.e. precision = 2 is 0.01 becomes --> 0.009
     float precision[8] = { 0.9, 0.09, 0.009, 0.0009, 0.00009, 0.000009, 0.0000009, 0.00000009 };
 
@@ -438,35 +390,31 @@ static uint8_t _populate_filtered_status_report()
     nv = nv->nx;                                // no need to check for NULL as list has just been reset
 
     for (uint8_t i=0; i<NV_STATUS_REPORT_LEN; i++) {
-        if (sr.status_report_list[i].index == 0) {  // end of list
+        if ((nv->index = sr.status_report_list[i]) == 0) {  // end of list
             break;
         }
-        // nv_get_nvObj(nv);
-        nv_reset_nv(nv);
-        nv->index = sr.status_report_list[i].index;
-        strcpy(nv->group, sr.status_report_list[i].group);
-        strcpy(nv->token, sr.status_report_list[i].token);
+        nv_get_nvObj(nv);
 
-        sr.status_report_list[i].get(nv);
-
-        // extract the value and cast into a float, regardless of value type
-        if (nv->valuetype == TYPE_FLOAT) {
+        // extract the value and cast into a float, regardless of value type 
+        if ((valueType)(cfgArray[nv->index].flags & F_TYPE_MASK) == TYPE_FLOAT) {
             current_value = nv->value_flt;
         } else {
             current_value = (float)nv->value_int;
         }
 
         // report values that have changed by more than the indicated precision, but always stops and ends
-        if ((fabs(current_value - sr.status_report_list[i].value) > precision[sr.status_report_list[i].precision]) ||
+        if ((fabs(current_value - sr.status_report_value[i]) > precision[cfgArray[nv->index].precision]) ||
+//            ((nv->index == sr.stat_index) && fp_EQ(nv->value_int, COMBINED_PROGRAM_STOP)) ||
+//            ((nv->index == sr.stat_index) && fp_EQ(nv->value_int, COMBINED_PROGRAM_END))) {
             ((nv->index == sr.stat_index) && (nv->value_int == COMBINED_PROGRAM_STOP)) ||
             ((nv->index == sr.stat_index) && (nv->value_int == COMBINED_PROGRAM_END))) {
 
-            strcpy(nv->token, sr.status_report_list[i].group);            // flatten out groups
-            strcat(nv->token + strlen(sr.status_report_list[i].group), sr.status_report_list[i].token);
-
-            sr.status_report_list[i].value = current_value;
+            strcpy(tmp, nv->group);            // flatten out groups - WARNING - you cannot use strncpy here...
+            strcat(tmp, nv->token);
+            strcpy(nv->token, tmp);            //...or here.
+            sr.status_report_value[i] = current_value;
             if ((nv = nv->nx) == NULL) {        // should never be NULL unless SR length exceeds available buffer array
-                return (false);
+                return (false); 
             }
             has_data = true;
         } else {
@@ -547,7 +495,7 @@ void qr_init_queue_report()
     qr.queue_report_requested = false;
     qr.buffers_added = 0;
     qr.buffers_removed = 0;
-    qr.init_tick = SysTickTimer.getValue();        // Uses C mapping of SysTickTimer.getValue();
+    qr.init_tick = SysTickTimer_getValue();        // Uses C mapping of SysTickTimer.getValue();
 }
 
 /*
@@ -571,7 +519,7 @@ void qr_request_queue_report(int8_t buffers)
 //    qr.motion_mode = cm_get_motion_mode(ACTIVE_MODEL);
     qr.motion_mode = cm_get_motion_mode((GCodeState_t *)&(cm->gm));
     if ((qr.motion_mode == MOTION_MODE_CW_ARC) || (qr.motion_mode == MOTION_MODE_CCW_ARC)) {
-        uint32_t tick = SysTickTimer.getValue();
+        uint32_t tick = SysTickTimer_getValue();
         if (tick - qr.init_tick < MIN_ARC_QR_INTERVAL) {
             qr.queue_report_requested = false;
             return;

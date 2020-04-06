@@ -37,7 +37,7 @@
 
 /*--- Hardware platform enumerations ---*/
 
-#define G2CORE_HARDWARE_PLATFORM    "Archim"
+#define G2CORE_HARDWARE_PLATFORM    "Archim" 
 #define G2CORE_HARDWARE_VERSION     "na"
 
 /***** Motors & PWM channels supported by this hardware *****/
@@ -53,7 +53,7 @@
 
 #define MILLISECONDS_PER_TICK 1     // MS for system tick (systick * N)
 #define SYS_ID_DIGITS 16            // actual digits in system ID (up to 16)
-#define SYS_ID_LEN 40               // total length including dashes and NUL
+#define SYS_ID_LEN 24               // total length including dashes and NUL
 
 /*************************
  * Motate Setup          *
@@ -105,14 +105,15 @@ using Motate::OutputPin;
 //#define FREQUENCY_DDA		200000UL		// Hz step frequency. Interrupts actually fire at 2x (400 KHz)
 #define FREQUENCY_DDA		150000UL		// Hz step frequency. Interrupts actually fire at 2x (300 KHz)
 #define FREQUENCY_DWELL		1000UL
+#define FREQUENCY_SGI		200000UL		// 200,000 Hz means software interrupts will fire 5 uSec after being called
 
 /**** Motate Definitions ****/
 
 // Timer definitions. See stepper.h and other headers for setup
 typedef TimerChannel<3,0> dda_timer_type;	// stepper pulse generation in stepper.cpp
 typedef TimerChannel<4,0> load_timer_type;	    // request load timer in stepper.cpp
-typedef ServiceCall exec_timer_type;	    // request exec timer in stepper.cpp
-typedef ServiceCall fwd_plan_timer_type;	// request exec timer in stepper.cpp
+typedef ServiceCall<1> exec_timer_type;	    // request exec timer in stepper.cpp
+typedef ServiceCall<2> fwd_plan_timer_type;	// request exec timer in stepper.cpp
 
 // Pin assignments
 
