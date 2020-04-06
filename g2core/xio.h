@@ -124,6 +124,7 @@ void xio_flush_to_command();
 #if MARLIN_COMPAT_ENABLED == true
 void xio_exit_fake_bootloader();
 #endif
+void xio_flush_device(devflags_t &flags);
 
 stat_t xio_set_spi(nvObj_t *nv);
 

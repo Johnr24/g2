@@ -46,14 +46,14 @@
 
 #define MOTORS 4                    // number of motors supported the hardware
 #define PWMS 2                      // number of PWM channels supported the hardware
+#define AXES 6                      // axes to support -- must be 6 or 9
 
 /*************************
  * Global System Defines *
  *************************/
 
 #define MILLISECONDS_PER_TICK 1     // MS for system tick (systick * N)
-#define SYS_ID_DIGITS 16            // actual digits in system ID (up to 16)
-#define SYS_ID_LEN 24               // total length including dashes and NUL
+#define SYS_ID_LEN 40               // total length including dashes and NUL
 
 /*************************
  * Motate Setup          *
@@ -61,10 +61,9 @@
 
 #include "MotatePins.h"
 #include "MotateTimers.h"           // for TimerChanel<> and related...
-#include "MotateServiceCall.h"      // for ServiceCall<>
+#include "MotateUtilities.h"           // for TimerChanel<> and related...
 
 using Motate::TimerChannel;
-using Motate::ServiceCall;
 
 using Motate::pin_number;
 using Motate::Pin;
@@ -102,10 +101,12 @@ using Motate::OutputPin;
 
 /**** Stepper DDA and dwell timer settings ****/
 
-//#define FREQUENCY_DDA		200000UL		// Hz step frequency. Interrupts actually fire at 2x (400 KHz)
-#define FREQUENCY_DDA		150000UL		// Hz step frequency. Interrupts actually fire at 2x (300 KHz)
+#define FREQUENCY_DDA		100000UL
 #define FREQUENCY_DWELL		1000UL
-#define FREQUENCY_SGI		200000UL		// 200,000 Hz means software interrupts will fire 5 uSec after being called
+#define MIN_SEGMENT_MS ((float)1.0)
+
+#define PLANNER_QUEUE_SIZE (48)
+#define SECONDARY_QUEUE_SIZE (10)
 
 /**** Motate Definitions ****/
 
@@ -118,11 +119,6 @@ typedef TimerChannel<5,0> fwd_plan_timer_type;	// request exec timer in stepper.
 
 pin_number indicator_led_pin_num = Motate::kLED_USBRXPinNumber;
 static PWMOutputPin<indicator_led_pin_num> IndicatorLed;
-
-// Init these to input to keep them high-z
-static Pin<Motate::kSPI0_MISOPinNumber> spi_miso_pin(Motate::kInput);
-static Pin<Motate::kSPI0_MOSIPinNumber> spi_mosi_pin(Motate::kInput);
-static Pin<Motate::kSPI0_SCKPinNumber>  spi_sck_pin(Motate::kInput);
 
 /**** Motate Global Pin Allocations ****/
 
@@ -139,19 +135,14 @@ static OutputPin<Motate::kGRBL_FeedHoldPinNumber> grbl_feedhold_pin;
 static OutputPin<Motate::kGRBL_CycleStartPinNumber> grbl_cycle_start_pin;
 
 static OutputPin<Motate::kGRBL_CommonEnablePinNumber> motor_common_enable_pin;
-static OutputPin<Motate::kSpindle_EnablePinNumber> spindle_enable_pin;
-static OutputPin<Motate::kSpindle_DirPinNumber> spindle_dir_pin;
-
-// NOTE: In the v9 and the Due the flood and mist coolants are mapped to a the same pin
-//static OutputPin<kCoolant_EnablePinNumber> coolant_enable_pin;
-static OutputPin<Motate::kCoolant_EnablePinNumber> flood_enable_pin;
-static OutputPin<Motate::kCoolant_EnablePinNumber> mist_enable_pin;
 
 // Input pins are defined in gpio.cpp
 
 /********************************
  * Function Prototypes (Common) *
  ********************************/
+
+const configSubtable *const getSysConfig_3();
 
 void hardware_init(void);			// master hardware init
 stat_t hardware_periodic();  // callback from the main loop (time sensitive)

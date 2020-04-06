@@ -53,7 +53,7 @@
 
 #define MILLISECONDS_PER_TICK 1     // MS for system tick (systick * N)
 #define SYS_ID_DIGITS 16            // actual digits in system ID (up to 16)
-#define SYS_ID_LEN 24               // total length including dashes and NUL
+#define SYS_ID_LEN 40               // total length including dashes and NUL
 
 /*************************
  * Motate Setup          *
@@ -61,10 +61,8 @@
 
 #include "MotatePins.h"
 #include "MotateTimers.h"           // for TimerChanel<> and related...
-#include "MotateServiceCall.h"      // for ServiceCall<>
 
 using Motate::TimerChannel;
-using Motate::ServiceCall;
 
 using Motate::pin_number;
 using Motate::Pin;
@@ -105,7 +103,6 @@ using Motate::OutputPin;
 //#define FREQUENCY_DDA		200000UL		// Hz step frequency. Interrupts actually fire at 2x (400 KHz)
 #define FREQUENCY_DDA		150000UL		// Hz step frequency. Interrupts actually fire at 2x (300 KHz)
 #define FREQUENCY_DWELL		1000UL
-#define FREQUENCY_SGI		200000UL		// 200,000 Hz means software interrupts will fire 5 uSec after being called
 
 /**** Motate Definitions ****/
 

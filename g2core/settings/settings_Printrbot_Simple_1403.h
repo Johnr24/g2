@@ -45,7 +45,7 @@
 #define SPINDLE_ENABLE_POLARITY           1                       // 0=active low, 1=active high
 #define SPINDLE_DIR_POLARITY              0                       // 0=clockwise is low, 1=clockwise is high
 #define SPINDLE_PAUSE_ON_HOLD             true
-#define SPINDLE_DWELL_TIME                1.0
+#define SPINDLE_SPINUP_DELAY              1.0
 
 #define COOLANT_MIST_POLARITY             1                       // 0=active low, 1=active high
 #define COOLANT_FLOOD_POLARITY            1                       // 0=active low, 1=active high
@@ -238,6 +238,54 @@
 
 
 //*** Input / output settings ***
+
+//** Temperature Sensors **
+
+#define HAS_TEMPERATURE_SENSOR_1  true
+#if HAS_TEMPERATURE_SENSOR_1
+    #define TEMPERATURE_SENSOR_1_CIRCUIT_TYPE ADCCircuitSimplePullup
+    #define TEMPERATURE_SENSOR_1_CIRCUIT_INIT { /*pullup_resistance:*/ 4700 }
+    #define TEMPERATURE_SENSOR_1_TYPE  Thermistor<ADCPin<Motate::kADC1_PinNumber>>
+    #define TEMPERATURE_SENSOR_1_INIT { \
+        /*T1:*/     20.0, /*T2:*/   190.0,  /*T3:*/ 255.0, \
+        /*R1:*/ 144700.0, /*R2:*/  5190.0, /*R3:*/ 4809.0, \
+        &temperature_sensor_1_circuit \
+    }
+#endif // HAS_TEMPERATURE_SENSOR_1
+
+#define EXTRUDER_1_OUTPUT_PIN kHeaterOutput1_PinNumber
+#define EXTRUDER_1_FAN_PIN    kOutput3_PinNumber
+
+#define HAS_TEMPERATURE_SENSOR_2  false
+#if HAS_TEMPERATURE_SENSOR_2
+    #define TEMPERATURE_SENSOR_2_CIRCUIT_TYPE ADCCircuitSimplePullup
+    #define TEMPERATURE_SENSOR_2_CIRCUIT_INIT { /*pullup_resistance:*/ 4700 }
+    #define TEMPERATURE_SENSOR_2_TYPE  Thermistor<ADCPin<Motate::kADC2_PinNumber>>
+    #define TEMPERATURE_SENSOR_2_INIT { \
+        /*T1:*/     20.0, /*T2:*/   190.0,  /*T3:*/ 255.0, \
+        /*R1:*/ 144700.0, /*R2:*/  5190.0, /*R3:*/ 4809.0, \
+        &temperature_sensor_2_circuit \
+    }
+#endif // HAS_TEMPERATURE_SENSOR_2
+
+// Warning - the PrintrBoardG2 doesn't have a Output2
+#define EXTRUDER_2_OUTPUT_PIN kHeaterOutput2_PinNumber
+
+#define HAS_TEMPERATURE_SENSOR_3  false
+#if HAS_TEMPERATURE_SENSOR_3
+    #define TEMPERATURE_SENSOR_3_CIRCUIT_TYPE ADCCircuitSimplePullup
+    #define TEMPERATURE_SENSOR_3_CIRCUIT_INIT { /*pullup_resistance:*/ 4700 }
+    #define TEMPERATURE_SENSOR_3_TYPE  Thermistor<ADCPin<Motate::kADC3_PinNumber>>
+    #define TEMPERATURE_SENSOR_3_INIT { \
+        /*T1:*/     20.0, /*T2:*/   190.0,  /*T3:*/ 255.0, \
+        /*R1:*/ 144700.0, /*R2:*/  5190.0, /*R3:*/ 4809.0, \
+        &temperature_sensor_3_circuit \
+    }
+#endif // HAS_TEMPERATURE_SENSOR_3
+
+#define BED_OUTPUT_PIN kHeaterOutput11_PinNumber
+
+
 /*
  IO_MODE_DISABLED
  IO_ACTIVE_LOW    aka NORMALLY_OPEN
