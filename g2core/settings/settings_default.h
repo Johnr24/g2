@@ -781,6 +781,7 @@
 #endif
 #ifndef Z_VELOCITY_MAX
 <<<<<<< HEAD
+<<<<<<< HEAD
 #define Z_VELOCITY_MAX              3000.0
 #endif
 #ifndef Z_FEEDRATE_MAX
@@ -791,6 +792,12 @@
 #ifndef Z_FEEDRATE_MAX
 #define Z_FEEDRATE_MAX              4000.0
 >>>>>>> parent of a02a4fb5... Pinout Tweak
+=======
+#define Z_VELOCITY_MAX              3000.0
+#endif
+#ifndef Z_FEEDRATE_MAX
+#define Z_FEEDRATE_MAX              3000.0
+>>>>>>> parent of 41d31871... DEFUCKED
 #endif
 #ifndef Z_TRAVEL_MAX
 #define Z_TRAVEL_MAX                0
@@ -800,10 +807,14 @@
 #endif
 #ifndef Z_JERK_MAX
 <<<<<<< HEAD
+<<<<<<< HEAD
 #define Z_JERK_MAX                  5000.0
 =======
 #define Z_JERK_MAX                  10000.0
 >>>>>>> parent of a02a4fb5... Pinout Tweak
+=======
+#define Z_JERK_MAX                  5000.0
+>>>>>>> parent of 41d31871... DEFUCKED
 #endif
 #ifndef Z_JERK_HIGH_SPEED
 #define Z_JERK_HIGH_SPEED           20000.0
@@ -1346,6 +1357,7 @@
 #ifdef DI9_FUNCTION
 #error DI9_FUNCTION is no longer used, please update your settings file
 #error Use DI9_ACTION instead
+<<<<<<< HEAD
 #endif
 #ifndef DI9_EXTERNAL_NUMBER
 #define DI9_EXTERNAL_NUMBER         9
@@ -1358,6 +1370,20 @@
 #ifndef DI10_ENABLED
 #define DI10_ENABLED                IO_DISABLED
 #endif
+=======
+#endif
+#ifndef DI9_EXTERNAL_NUMBER
+#define DI9_EXTERNAL_NUMBER         9
+#endif
+
+#ifdef DI10_MODE
+#error DI10_MODE is no longer used, please update your settings file
+#error Use DI10_ENABLED and DI10_POLARITY instead
+#endif
+#ifndef DI10_ENABLED
+#define DI10_ENABLED                IO_DISABLED
+#endif
+>>>>>>> parent of 41d31871... DEFUCKED
 #ifndef DI10_POLARITY
 #define DI10_POLARITY               IO_ACTIVE_LOW     // Normally open
 #endif
@@ -1391,12 +1417,21 @@
 #endif
 #ifndef DI11_EXTERNAL_NUMBER
 #define DI11_EXTERNAL_NUMBER         11
+<<<<<<< HEAD
 #endif
 
 #ifdef DI12_MODE
 #error DI12_MODE is no longer used, please update your settings file
 #error Use DI12_ENABLED and DI12_POLARITY instead
 #endif
+=======
+#endif
+
+#ifdef DI12_MODE
+#error DI12_MODE is no longer used, please update your settings file
+#error Use DI12_ENABLED and DI12_POLARITY instead
+#endif
+>>>>>>> parent of 41d31871... DEFUCKED
 #ifndef DI12_ENABLED
 #define DI12_ENABLED                IO_DISABLED
 #endif
@@ -1463,6 +1498,7 @@
 #endif
 #ifndef DO4_EXTERNAL_NUMBER
 #define DO4_EXTERNAL_NUMBER         4
+<<<<<<< HEAD
 #endif
 
 #ifndef DO5_ENABLED
@@ -1533,6 +1569,78 @@
 #ifndef DO11_POLARITY
 #define DO11_POLARITY               IO_ACTIVE_HIGH
 #endif
+=======
+#endif
+
+#ifndef DO5_ENABLED
+#define DO5_ENABLED                 IO_ENABLED
+#endif
+#ifndef DO5_POLARITY
+#define DO5_POLARITY                IO_ACTIVE_HIGH
+#endif
+#ifndef DO5_EXTERNAL_NUMBER
+#define DO5_EXTERNAL_NUMBER         5
+#endif
+
+#ifndef DO6_ENABLED
+#define DO6_ENABLED                 IO_ENABLED
+#endif
+#ifndef DO6_POLARITY
+#define DO6_POLARITY                IO_ACTIVE_HIGH
+#endif
+#ifndef DO6_EXTERNAL_NUMBER
+#define DO6_EXTERNAL_NUMBER         6
+#endif
+
+#ifndef DO7_ENABLED
+#define DO7_ENABLED                 IO_ENABLED
+#endif
+#ifndef DO7_POLARITY
+#define DO7_POLARITY                IO_ACTIVE_HIGH
+#endif
+#ifndef DO7_EXTERNAL_NUMBER
+#define DO7_EXTERNAL_NUMBER         7
+#endif
+
+#ifndef DO8_ENABLED
+#define DO8_ENABLED                 IO_ENABLED
+#endif
+#ifndef DO8_POLARITY
+#define DO8_POLARITY                IO_ACTIVE_HIGH
+#endif
+#ifndef DO8_EXTERNAL_NUMBER
+#define DO8_EXTERNAL_NUMBER         8
+#endif
+
+//SAFEin (Output) signal
+#ifndef DO9_ENABLED
+#define DO9_ENABLED                 IO_ENABLED
+#endif
+#ifndef DO9_POLARITY
+#define DO9_POLARITY                IO_ACTIVE_HIGH
+#endif
+#ifndef DO9_EXTERNAL_NUMBER
+#define DO9_EXTERNAL_NUMBER         9
+#endif
+
+#ifndef DO10_ENABLED
+#define DO10_ENABLED                IO_ENABLED
+#endif
+#ifndef DO10_POLARITY
+#define DO10_POLARITY               IO_ACTIVE_HIGH
+#endif
+#ifndef DO10_EXTERNAL_NUMBER
+#define DO10_EXTERNAL_NUMBER         10
+#endif
+
+//Header Bed FET
+#ifndef DO11_ENABLED
+#define DO11_ENABLED                IO_ENABLED
+#endif
+#ifndef DO11_POLARITY
+#define DO11_POLARITY               IO_ACTIVE_HIGH
+#endif
+>>>>>>> parent of 41d31871... DEFUCKED
 #ifndef DO11_EXTERNAL_NUMBER
 #define DO11_EXTERNAL_NUMBER         11
 #endif
