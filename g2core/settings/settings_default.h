@@ -782,6 +782,7 @@
 #ifndef Z_VELOCITY_MAX
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 #define Z_VELOCITY_MAX              3000.0
 #endif
 #ifndef Z_FEEDRATE_MAX
@@ -798,6 +799,12 @@
 #ifndef Z_FEEDRATE_MAX
 #define Z_FEEDRATE_MAX              3000.0
 >>>>>>> parent of 41d31871... DEFUCKED
+=======
+#define Z_VELOCITY_MAX              4000.0
+#endif
+#ifndef Z_FEEDRATE_MAX
+#define Z_FEEDRATE_MAX              4000.0
+>>>>>>> parent of a02a4fb5... Pinout Tweak
 #endif
 #ifndef Z_TRAVEL_MAX
 #define Z_TRAVEL_MAX                0
@@ -808,6 +815,7 @@
 #ifndef Z_JERK_MAX
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 #define Z_JERK_MAX                  5000.0
 =======
 #define Z_JERK_MAX                  10000.0
@@ -815,6 +823,9 @@
 =======
 #define Z_JERK_MAX                  5000.0
 >>>>>>> parent of 41d31871... DEFUCKED
+=======
+#define Z_JERK_MAX                  10000.0
+>>>>>>> parent of a02a4fb5... Pinout Tweak
 #endif
 #ifndef Z_JERK_HIGH_SPEED
 #define Z_JERK_HIGH_SPEED           20000.0
