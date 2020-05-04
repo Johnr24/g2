@@ -438,7 +438,7 @@
 #define X_JERK_MAX                  6500.0                  // {xjm:
 #endif
 #ifndef X_JERK_HIGH_SPEED
-#define X_JERK_HIGH_SPEED           20000.0                  // {xjh:
+#define X_JERK_HIGH_SPEED           6500                  // {xjh:
 #endif
 #ifndef X_HOMING_INPUT
 #define X_HOMING_INPUT              1                       // {xhi:  input used for homing or 0 to disable
@@ -945,7 +945,7 @@
 
 // Safety line BMIN? - THIS IS THE EMERGENCY STOP (pin A6)
 #ifndef DI9_MODE
-#define DI9_MODE                    IO_ACTIVE_HIGH     // Normally closed
+#define DI9_MODE                    IO_ACTIVE_LOW     // Normally closed
 #endif
 #ifndef DI9_ACTION
 #define DI9_ACTION                  INPUT_ACTION_FAST_STOP
@@ -968,7 +968,7 @@
 #define DI11_MODE                   IO_MODE_DISABLED     // Normally open
 #endif
 #ifndef DI11_ACTION
-#define DI11_ACTION                 INPUT_ACTION_NONE
+#define DI11_ACTION                 INPUT_ACTION
 #endif
 #ifndef DI11_FUNCTION
 #define DI11_FUNCTION               INPUT_FUNCTION_NONE
