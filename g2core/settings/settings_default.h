@@ -94,7 +94,7 @@
 #endif
 
 #ifndef SPINDLE_PAUSE_ON_HOLD
-#define SPINDLE_PAUSE_ON_HOLD       false   // {spph:
+#define SPINDLE_PAUSE_ON_HOLD       true   // {spph:
 #endif
 
 #ifndef SPINDLE_SPINUP_DELAY
@@ -126,7 +126,7 @@
 #endif
 
 #ifndef FEEDHOLD_Z_LIFT
-#define FEEDHOLD_Z_LIFT             0       // {zl: mm to lift Z on feedhold
+#define FEEDHOLD_Z_LIFT             20       // {zl: mm to lift Z on feedhold
 #endif
 
 #ifndef PROBE_REPORT_ENABLE 
@@ -134,7 +134,7 @@
 #endif
 
 #ifndef MANUAL_FEEDRATE_OVERRIDE_ENABLE
-#define MANUAL_FEEDRATE_OVERRIDE_ENABLE false
+#define MANUAL_FEEDRATE_OVERRIDE_ENABLE true
 #endif
 
 #ifndef MANUAL_FEEDRATE_OVERRIDE_PARAMETER
@@ -265,7 +265,7 @@
 #define M2_TRAVEL_PER_REV           40.00
 #endif
 #ifndef M2_MICROSTEPS
-#define M2_MICROSTEPS               32
+#define M2_MICROSTEPS               16
 #endif
 #ifndef M2_STEPS_PER_UNIT
 #define M2_STEPS_PER_UNIT           0
@@ -329,7 +329,7 @@
 #define M4_TRAVEL_PER_REV           360.0                   // in degrees if rotary axis (ABC)
 #endif
 #ifndef M4_MICROSTEPS
-#define M4_MICROSTEPS               8
+#define M4_MICROSTEPS               16
 #endif
 #ifndef M4_STEPS_PER_UNIT
 #define M4_STEPS_PER_UNIT           0
@@ -344,7 +344,7 @@
 #define M4_STEP_POLARITY            IO_ACTIVE_HIGH
 #endif
 #ifndef M4_POWER_MODE
-#define M4_POWER_MODE               MOTOR_DISABLED
+#define M4_POWER_MODE               MOTOR_ALWAYS_POWERED
 #endif
 #ifndef M4_POWER_LEVEL
 #define M4_POWER_LEVEL              0.0
@@ -447,16 +447,16 @@
 #define X_HOMING_DIRECTION          0                       // {xhd:  0=search moves negative, 1= search moves positive
 #endif
 #ifndef X_SEARCH_VELOCITY
-#define X_SEARCH_VELOCITY          10000.0                   // {xsv:  minus means move to minimum switch
+#define X_SEARCH_VELOCITY          3000.0                   // {xsv:  minus means move to minimum switch
 #endif
 #ifndef X_LATCH_VELOCITY
-#define X_LATCH_VELOCITY            100.0                   // {xlv:  mm/min
+#define X_LATCH_VELOCITY            50.0                   // {xlv:  mm/min
 #endif
 #ifndef X_LATCH_BACKOFF
-#define X_LATCH_BACKOFF             4.0                     // {xlb:  mm
+#define X_LATCH_BACKOFF             10.0                     // {xlb:  mm
 #endif
 #ifndef X_ZERO_BACKOFF
-#define X_ZERO_BACKOFF              2.0                     // {xzb:  mm
+#define X_ZERO_BACKOFF              4.0                     // {xzb:  mm
 #endif
 
 // Y AXIS
@@ -464,7 +464,7 @@
 #define Y_AXIS_MODE                 AXIS_STANDARD
 #endif
 #ifndef Y_VELOCITY_MAX
-#define Y_VELOCITY_MAX              8000.0
+#define Y_VELOCITY_MAX              16000.0
 #endif
 #ifndef Y_FEEDRATE_MAX
 #define Y_FEEDRATE_MAX              8000.0
@@ -494,10 +494,10 @@
 #define Y_LATCH_VELOCITY            100.0
 #endif
 #ifndef Y_LATCH_BACKOFF
-#define Y_LATCH_BACKOFF             4.0
+#define Y_LATCH_BACKOFF             10
 #endif
 #ifndef Y_ZERO_BACKOFF
-#define Y_ZERO_BACKOFF              2.0
+#define Y_ZERO_BACKOFF              4.0
 #endif
 
 // Z AXIS
@@ -529,16 +529,16 @@
 #define Z_HOMING_DIRECTION          1
 #endif
 #ifndef Z_SEARCH_VELOCITY
-#define Z_SEARCH_VELOCITY           2200.0
+#define Z_SEARCH_VELOCITY           1000.0
 #endif
 #ifndef Z_LATCH_VELOCITY
-#define Z_LATCH_VELOCITY            25.0
+#define Z_LATCH_VELOCITY            50.0
 #endif
 #ifndef Z_LATCH_BACKOFF
-#define Z_LATCH_BACKOFF             4.0
+#define Z_LATCH_BACKOFF             10.0
 #endif
 #ifndef Z_ZERO_BACKOFF
-#define Z_ZERO_BACKOFF              2.0
+#define Z_ZERO_BACKOFF              10
 #endif
 
 // U AXIS
@@ -698,7 +698,7 @@
 
 // A AXIS
 #ifndef A_AXIS_MODE
-#define A_AXIS_MODE                 AXIS_DISABLED
+#define A_AXIS_MODE                 AXIS_RADIUS
 #endif
 #ifndef A_RADIUS
 #define A_RADIUS                    (M4_TRAVEL_PER_REV/(2*3.14159628))
@@ -955,33 +955,33 @@
 #endif
 // BMAX?
 #ifndef DI10_MODE
-#define DI10_MODE                   IO_MODE_DISABLED     // Normally open
+#define DI10_MODE                   IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI10_ACTION
-#define DI10_ACTION                 INPUT_ACTION_NONE
+#define DI10_ACTION                 INPUT_ACTION_RESET
 #endif
 #ifndef DI10_FUNCTION
 #define DI10_FUNCTION               INPUT_FUNCTION_NONE
 #endif
 //CMIN
 #ifndef DI11_MODE
-#define DI11_MODE                   IO_MODE_DISABLED     // Normally open
+#define DI11_MODE                   IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI11_ACTION
-#define DI11_ACTION                 INPUT_ACTION
+#define DI11_ACTION                 INPUT_ACTION_STOP
 #endif
 #ifndef DI11_FUNCTION
 #define DI11_FUNCTION               INPUT_FUNCTION_NONE
 #endif
 //CMAX
 #ifndef DI12_MODE
-#define DI12_MODE                   IO_MODE_DISABLED     // Normally open
+#define DI12_MODE                   IO_ACTIVE_LOW     // Normally open
 #endif
 #ifndef DI12_ACTION
-#define DI12_ACTION                 INPUT_ACTION_NONE
+#define DI12_ACTION                 INPUT_ACTION_HALT
 #endif
 #ifndef DI12_FUNCTION
-#define DI12_FUNCTION               INPUT_FUNCTION_NONE
+#define DI12_FUNCTION               INPUT_FUNCTION_SHUTDOWN
 #endif
 
 // DIGITAL OUTPUTS - Currently these are hard-wired to extruders
@@ -1244,10 +1244,10 @@
 #endif
 
 #ifndef G58_X_OFFSET
-#define G58_X_OFFSET 0
+#define G58_X_OFFSET 251
 #endif
 #ifndef G58_Y_OFFSET
-#define G58_Y_OFFSET 0
+#define G58_Y_OFFSET 34
 #endif
 #ifndef G58_Z_OFFSET
 #define G58_Z_OFFSET 0
@@ -1272,13 +1272,13 @@
 #endif
 
 #ifndef G59_X_OFFSET
-#define G59_X_OFFSET 0
+#define G59_X_OFFSET 78.53
 #endif
 #ifndef G59_Y_OFFSET
-#define G59_Y_OFFSET 0
+#define G59_Y_OFFSET 155.420
 #endif
 #ifndef G59_Z_OFFSET
-#define G59_Z_OFFSET 0
+#define G59_Z_OFFSET 136.548
 #endif
 #ifndef G59_U_OFFSET
 #define G59_U_OFFSET 0
